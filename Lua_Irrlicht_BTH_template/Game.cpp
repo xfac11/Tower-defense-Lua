@@ -84,7 +84,8 @@ int Game::C_setVisible(lua_State* L)
 
 	bool arg = lua_toboolean(L, -1);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -2);
-	node->setVisible(arg);
+	if(node != nullptr)
+		node->setVisible(arg);
 	lua_pop(L, 2);
 	//get the parameter, a bool
 	//get the parameter, a int
