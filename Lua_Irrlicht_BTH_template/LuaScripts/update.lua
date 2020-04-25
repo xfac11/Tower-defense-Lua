@@ -14,10 +14,10 @@ if arg then
     x = x + 1--lua start at 1
     z = z + 1
     
-    x = math.floor( x )
+    x = math.floor( x )--removes the decimal  ex: 3.8 ==> 3
     z = math.floor( z )
 
-    posX = x
+    posX = x--stores the cellindex
     posY = z
 
     
