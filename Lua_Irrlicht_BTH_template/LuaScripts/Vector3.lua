@@ -3,16 +3,33 @@
 
 local Vector3 = {x = 0, y = 0, z = 0}
 
-function Vector3:new(c)
-    c = c or {}
+function Vector3:new(x, y, z)
+    c = {}
     self.__index = self
-    return setmetatable(c, self)
+    
+    setmetatable(c, self)
+
+    c.x = x 
+    c.y = y 
+    c.z = z
+
+    return c
 end
 
 function Vector3:insert(x, y, z)
     self.x = x
     self.y = y
     self.z = z
+end
+
+function Vector3:sub(rightVec)
+    local vec = Vector3:new()
+
+    vec.x = self.x - rightVec.x
+    vec.y = self.y - rightVec.y
+    vec.z = self.z - rightVec.z
+    
+    return vec
 end
 
 function Vector3:normalize()

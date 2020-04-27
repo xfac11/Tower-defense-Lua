@@ -129,6 +129,9 @@ public:
 	static int C_setColor(lua_State* L);
 	static int C_getMousePos3D(lua_State* L);
 	static int C_setCamPos(lua_State* L);
+	static int C_setUIPos(lua_State* L);
+	static int C_isButtonPressed(lua_State* L);
+	static int C_getDeltaTime(lua_State* L);
 	lua_State* L;
 private:
 	static MyEventReceiver eventRec;
@@ -137,6 +140,7 @@ private:
 	static irr::gui::IGUIEnvironment* guienv;
 	static irr::IrrlichtDevice* device;
 	static irr::scene::ICameraSceneNode* camera;
+	static float deltaTime;
 	void render();//C++
 	void initialize();
 	void update();//LUA

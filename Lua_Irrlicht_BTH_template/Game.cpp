@@ -5,6 +5,8 @@ irr::scene::ISceneManager* Game::smgr = nullptr;
 irr::gui::IGUIEnvironment* Game::guienv = nullptr;
 irr::scene::ICameraSceneNode* Game::camera = nullptr;
 MyEventReceiver Game::eventRec = MyEventReceiver();
+float Game::deltaTime = 0;
+
 
 Game::Game()
 {
@@ -23,10 +25,12 @@ void Game::run()
 	initialize();
 	initLua();
 	device->getCursorControl()->setVisible(true);
-
+	irr::u32 then = device->getTimer()->getTime();
 	while (device->run())
 	{
-
+		const irr::u32 now = device->getTimer()->getTime();
+		deltaTime = (irr::f32)(now - then) / 1000.f; // Time in seconds
+		then = now;
 		this->update();
 		this->render();
 		
@@ -40,42 +44,61 @@ int Game::C_addToDraw(lua_State* L)
 
 	int type = (int)lua_tonumber(L,-2);
 	lua_remove(L, -2);
-	switch (type)
+	if (type == 0)
 	{
-	case 0:
 		//mesh
-		
+
 		const char* model = lua_tostring(L, -1);
 		lua_pop(L, 1);
 		irr::scene::IMesh* mesh = smgr->getMesh(model);//change to model
-		
+
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
 		node->setMaterialTexture(0, driver->getTexture("3DObjects/cube2.tga"));
 		//node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 		//scene::IMeshSceneNode* pi = (scene::IMeshSceneNode*)lua_newuserdata(L, sizeof(scene::IMeshSceneNode));
 		lua_pushlightuserdata(L, node);
-		
-		break;
-	}
-	////Create meshnode with string parameter
-	////put in array of pointers
-	////return index of the place in the array
 
-	//std::string meshFile = lua_tostring(L, -1);
-	//irr::scene::IMesh* planeMesh = smgr->getMesh("3DObjects/planeGrass.obj");
-	//if (!planeMesh)
-	//{
-	//	device->drop();
-	//	return 1;
-	//}
-	//irr::scene::IMeshSceneNode* planeGrassNode = smgr->addMeshSceneNode(planeMesh);
-	//lua_pushnumber(L, index);
+	}
+	else if (type == 1)
+	{
+		//button
+
+		const char* texture = lua_tostring(L, -1);
+		lua_pop(L, 1);
+
+		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 100, 100));
+		button->setImage(driver->getTexture(texture));
+		
+		button->setText(L"Button");
+		
+
+		lua_pushlightuserdata(L, button);
+	}
+	else if(type == 2)
+	{
+		//text
+
+	}
+
 	return 1;
 }
 
 int Game::C_removeFromDraw(lua_State* L)
 {
-	//remove it from array and delete it
+	int type = (int)lua_tonumber(L, -2);
+	lua_remove(L, -2);
+	switch (type)
+	{
+	case 0:
+		//mesh
+
+		scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		if(node != nullptr)
+			node->remove();
+
+		break;
+	}
 	return 0;
 }
 
@@ -254,6 +277,30 @@ int Game::C_setCamPos(lua_State* L)
 	camera->setPosition(pos);
 	return 0;
 }
+int Game::C_setUIPos(lua_State* L)
+{
+	int x = (int)lua_tonumber(L, -2);
+	int y = (int)lua_tonumber(L, -1);
+
+	gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -3);
+	if (button)
+		button->setRelativePosition(core::vector2di(x, y));
+	lua_pop(L, 3);
+	return 0;
+}
+int Game::C_isButtonPressed(lua_State* L)
+{
+	gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	if (button)
+		lua_pushboolean(L, button->isPressed());
+	return 1;
+}
+int Game::C_getDeltaTime(lua_State* L)
+{
+	lua_pushnumber(L, deltaTime);
+	return 1;
+}
 void Game::render()
 {
 	if (device->isWindowActive())
@@ -326,6 +373,10 @@ void Game::initLua()
 	lua_setglobal(L, "C_getMousePos3D");
 	lua_pushcfunction(L, this->C_setCamPos);
 	lua_setglobal(L, "C_setCamPos");
+	lua_pushcfunction(L, this->C_isButtonPressed);
+	lua_setglobal(L, "C_isButtonPressed");
+	lua_pushcfunction(L, this->C_getDeltaTime);
+	lua_setglobal(L, "C_getDeltaTime");
 	int error = luaL_loadfile(L, "E:/Lua_Irrlicht_BTH_template/Lua_Irrlicht_BTH_template/LuaScripts/test2.lua"); 
 	if (error)
 	{
