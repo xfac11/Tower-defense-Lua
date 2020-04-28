@@ -32,12 +32,13 @@ arg2 = C_isButtonPressed(button)
 if arg2 and isPressed == false then
 
     print("pressed")
-    e1:takeDmg(20)
+    local pos = Vector3:new(5, 0, 0)
+    bulletHandler:fireBullet(1, pos, 10, 10)
 
     isPressed = true
     --[[--]]
 elseif isPressed and arg2 == false then
     isPressed = false
 end
+bulletHandler:updateBullets(deltatime)
 e1:update(deltatime)
-

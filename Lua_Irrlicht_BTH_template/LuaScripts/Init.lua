@@ -3,6 +3,9 @@ Gameobject = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Gameobject.lua")
 Grid = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Grid.lua")
 Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
 Enemy = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Enemy.lua")
+Bullet = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Bullet.lua")
+BulletHandler = dofile("Lua_Irrlicht_BTH_template/LuaScripts/BulletHandler.lua")
+
 grid = Grid:new()
 posX = -1
 posY = -1
@@ -56,5 +59,8 @@ e1.waypoints = waypoints
 e1.endIndex = 4
 e1.from:insert(waypoints[1].x, waypoints[1].y, waypoints[1].z)
 e1.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
+
+enemies = {e1}
+bulletHandler = BulletHandler:new()
 
 

@@ -20,6 +20,12 @@ function Gameobject:addToDraw()
     print("added to draw")
 end
 
+function Gameobject:removeFromDraw()
+    
+    self.typePtr = C_removeFromDraw(0, self.typePtr)
+    print("removed from draw")
+end
+
 function Gameobject:move(x, y, z)
     self.position.x = self.position.x + x
     self.position.y = self.position.y + y
@@ -64,5 +70,8 @@ function Gameobject:setRotation(x, y, z)
     C_setRotationC(self.typePtr, self.rotation.x, self.rotation.y, self.rotation.z)
 end
 
+function Gameobject:setScale(x, y, z)
+    C_setScale(self.typePtr, x, y, z)
+end
 
 return Gameobject

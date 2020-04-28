@@ -377,6 +377,8 @@ void Game::initLua()
 	lua_setglobal(L, "C_isButtonPressed");
 	lua_pushcfunction(L, this->C_getDeltaTime);
 	lua_setglobal(L, "C_getDeltaTime");
+	lua_pushcfunction(L, this->C_removeFromDraw);
+	lua_setglobal(L, "C_removeFromDraw");
 	int error = luaL_loadfile(L, "E:/Lua_Irrlicht_BTH_template/Lua_Irrlicht_BTH_template/LuaScripts/test2.lua"); 
 	if (error)
 	{
