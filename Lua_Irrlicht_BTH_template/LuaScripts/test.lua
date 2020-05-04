@@ -1,5 +1,5 @@
-function initialize()
-    player = 1
+function ChangeValue(x)
+    x = 6
 end
-dofile("test2.lua")
 
+Value = {}
