@@ -5,7 +5,7 @@
 --This index will be used for updating pos,rot,texture,model etc in c++
 --Must be used for rendered objects
 -- -1 means no object in irrlicht is added to be rendered for this gameobject
-local Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
+local Vector3 = dofile("LuaScripts/Vector3.lua")
 local Gameobject = {position = Vector3:new(), rotation = Vector3:new(), model = "", drawType = -1, typePtr = 0 }
 
 function Gameobject:new(c)

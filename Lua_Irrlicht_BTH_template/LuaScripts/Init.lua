@@ -1,10 +1,11 @@
-Key = dofile("Lua_Irrlicht_BTH_template/LuaScripts/KeyboardKeys.lua")
-Gameobject = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Gameobject.lua")
-Grid = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Grid.lua")
-Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
-Enemy = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Enemy.lua")
-Bullet = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Bullet.lua")
-BulletHandler = dofile("Lua_Irrlicht_BTH_template/LuaScripts/BulletHandler.lua")
+print("In init")
+Key = dofile("LuaScripts/KeyboardKeys.lua")
+Gameobject = dofile("LuaScripts/Gameobject.lua")
+Grid = dofile("LuaScripts/Grid.lua")
+Vector3 = dofile("LuaScripts/Vector3.lua")
+Enemy = dofile("LuaScripts/Enemy.lua")
+Bullet = dofile("LuaScripts/Bullet.lua")
+BulletHandler = dofile("LuaScripts/BulletHandler.lua")
 
 grid = Grid:new()
 posX = -1

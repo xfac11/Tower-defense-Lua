@@ -1,6 +1,6 @@
-local Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
-local Gameobject = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Gameobject.lua")
-local Bullet = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Bullet.lua")
+local Vector3 = dofile("LuaScripts/Vector3.lua")
+local Gameobject = dofile("LuaScripts/Gameobject.lua")
+local Bullet = dofile("LuaScripts/Bullet.lua")
 local BulletHandler = {bullets = {}, nrOfBullets = 0}
 --[[
     speed: How fast the bullet travels

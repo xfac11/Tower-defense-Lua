@@ -333,7 +333,7 @@ void Game::initialize()
 	this->guienv = device->getGUIEnvironment();
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
-	device->getFileSystem()->changeWorkingDirectoryTo("E:/Lua_Irrlicht_BTH_template");
+	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
 	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 100, 0));
 }
 
@@ -350,7 +350,7 @@ void Game::update()
 			std::cout << "error";
 		}
 	}
-	luaL_dofile(L, "Lua_Irrlicht_BTH_template/LuaScripts/update.lua");
+	luaL_dofile(L, "LuaScripts/update.lua");
 }
 
 void Game::initLua()
@@ -385,7 +385,7 @@ void Game::initLua()
 		std::cout << "error";
 	}
 
-	luaL_dofile(L, "Lua_Irrlicht_BTH_template/LuaScripts/Init.lua");
+	luaL_dofile(L, "LuaScripts/Init.lua");
 
 
 }

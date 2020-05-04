@@ -1,7 +1,7 @@
 
 
-local Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
-local Gameobject = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Gameobject.lua")
+local Vector3 = dofile("LuaScripts/Vector3.lua")
+local Gameobject = dofile("LuaScripts/Gameobject.lua")
 local Enemy = {obj = Gameobject:new(), from = Vector3:new(), to = Vector3:new(), check = 1, waypoints = 0, 
 startIndex = 1, endIndex = 0, hp = 100}
 
