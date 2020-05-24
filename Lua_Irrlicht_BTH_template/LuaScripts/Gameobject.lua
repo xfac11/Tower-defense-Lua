@@ -6,16 +6,21 @@
 --Must be used for rendered objects
 -- -1 means no object in irrlicht is added to be rendered for this gameobject
 local Vector3 = dofile("LuaScripts/Vector3.lua")
-local Gameobject = {position = Vector3:new(), rotation = Vector3:new(), model = "", drawType = -1, typePtr = 0 }
+local Gameobject = {position = Vector3:new(0, 0, 0), rotation = Vector3:new(0, 0, 0), model = "", drawType = -1, typePtr = 0 }
 
 function Gameobject:new(c)
+    print("start of obj new")
     c = c or {}
     self.__index = self
-    return setmetatable(c, self)
+    setmetatable(c, self)
+    c.position = Vector3:new(0, 0, 0)
+    c.rotation = Vector3:new(0, 0, 0)
+    c.model = "3DObjects/cube2.obj"
+    return c
 end
 
 function Gameobject:addToDraw()
-    
+    print("asd2.3")
     self.typePtr = C_addToDraw(0, self.model)
     print("added to draw")
 end
@@ -52,7 +57,7 @@ function Gameobject:rotate(x, y, z)
             self.rotation[key] = self.rotation[key] + 360
         end
     end
-    C_setRotationC(self.typePtr, self.rotation.x, self.rotation.y, self.rotation.z)
+    C_setRotation(self.typePtr, self.rotation.x, self.rotation.y, self.rotation.z)
 end
 
 function Gameobject:setRotation(x, y, z)
@@ -67,7 +72,7 @@ function Gameobject:setRotation(x, y, z)
             self.rotation[key] = self.rotation[key] + 360
         end
     end
-    C_setRotationC(self.typePtr, self.rotation.x, self.rotation.y, self.rotation.z)
+    C_setRotation(self.typePtr, self.rotation.x, self.rotation.y, self.rotation.z)
 end
 
 function Gameobject:setScale(x, y, z)

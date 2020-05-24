@@ -15,23 +15,22 @@ function BulletHandler:new()
 end
 
 function BulletHandler:fireBullet(enemyID, pos, dmg, speed)
-    self.nrOfBullets = self.nrOfBullets + 1 
+    self.nrOfBullets = self.nrOfBullets + 1
     self.bullets[self.nrOfBullets] = Bullet:new(self.nrOfBullets, enemyID, dmg, speed)
-    self.bullets[self.nrOfBullets].obj.model = "3DObjects/cube2.obj"
+    self.bullets[self.nrOfBullets].obj = Gameobject:new()
     self.bullets[self.nrOfBullets].obj:addToDraw()
-    self.bullets[self.nrOfBullets].obj:setPosition(pos.x, pos.y, pos.z)
-    self.bullets[self.nrOfBullets].obj:setScale(0.1, 0.1, 0.1)
-    print("fire bullet")
+    self.bullets[self.nrOfBullets]:setPosition(pos.x, pos.y, pos.z)
+    self.bullets[self.nrOfBullets]:setScale(0.1, 0.1, 0.1)
 end
 
 function BulletHandler:updateBullets(deltaTime)
+    
     for i=1,self.nrOfBullets do
         local vec = enemies[self.bullets[i].enemyID].obj.position:sub(self.bullets[i].obj.position)
         local vecNor = vec:normalize()
         self.bullets[i].obj:move(vecNor.x * self.bullets[i].speed * deltaTime, vecNor.y * self.bullets[i].speed * deltaTime, vecNor.z * self.bullets[i].speed * deltaTime)
-        print("update bullets" .. tostring(self.bullets[i].id) .. " " .. tostring(self.bullets[i].enemyID))
     end
-    --self:collision()
+    self:collision()
 end
 
 function BulletHandler:collision()
@@ -39,7 +38,7 @@ function BulletHandler:collision()
         local toEnemy = enemies[self.bullets[i].enemyID].obj.position:sub(self.bullets[i].obj.position)
         local lengthTo = toEnemy:length()
 
-        if lengthTo < 0.1 then
+        if lengthTo < 0.2 then
             enemies[self.bullets[i].enemyID]:takeDmg(self.bullets[i].dmg)
             --remove bullet
             self.bullets[i].obj:removeFromDraw()
@@ -48,6 +47,7 @@ function BulletHandler:collision()
             self.bullets[i] = temp
             self.bullets[self.nrOfBullets] = nil
             self.nrOfBullets = self.nrOfBullets - 1
+            COINS = COINS + 10
         end
     end
 end

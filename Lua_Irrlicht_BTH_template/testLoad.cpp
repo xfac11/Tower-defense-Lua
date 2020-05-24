@@ -1,4 +1,5 @@
 #include"Game.h"
+#define _IRR_COMPILE_WITH_BMP_LOADER_
 void ConsoleThread(lua_State* L)
 {
 	char command[1000];
@@ -14,14 +15,14 @@ int main()
 {
 	Game game;
 	/*
-	En bra tumregel för att separera logik från C++ är att tänka på att C++-delen ska kunna användas till olika typer av spel.
-	Det är i Lua vi faktiskt skapar spelet. I verkligheten är det självklart inte så extremt, men i uppgiften gör vi så för tydlighetens skull
+	En bra tumregel f?r att separera logik fr?n C++ ?r att t?nka p? att C++-delen ska kunna anv?ndas till olika typer av spel.
+	Det ?r i Lua vi faktiskt skapar spelet. I verkligheten ?r det sj?lvklart inte s? extremt, men i uppgiften g?r vi s? f?r tydlighetens skull
 	*/
-	std::thread conThread(ConsoleThread, game.L);
-	
-	game.run();
-	
+	//std::thread conThread(ConsoleThread, game.L);
 
-	conThread.join();
+	game.run();
+
+
+	//conThread.join();
 	return 0;
 }

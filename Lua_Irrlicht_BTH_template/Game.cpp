@@ -4,8 +4,11 @@ irr::video::IVideoDriver* Game::driver = nullptr;
 irr::scene::ISceneManager* Game::smgr = nullptr;
 irr::gui::IGUIEnvironment* Game::guienv = nullptr;
 irr::scene::ICameraSceneNode* Game::camera = nullptr;
+const irr::scene::IGeometryCreator* Game::geomentryCreator = nullptr;
+
 MyEventReceiver Game::eventRec = MyEventReceiver();
 float Game::deltaTime = 0;
+irr::gui::IGUIFont* Game::font = nullptr;
 
 
 Game::Game()
@@ -17,7 +20,7 @@ Game::Game()
 
 Game::~Game()
 {
-	lua_close(L);
+
 }
 
 void Game::run()
@@ -33,16 +36,16 @@ void Game::run()
 		then = now;
 		this->update();
 		this->render();
-		
+
 	}
 	device->drop();
-
+	lua_close(L);
 }
 
 int Game::C_addToDraw(lua_State* L)
 {
 
-	int type = (int)lua_tonumber(L,-2);
+	int type = (int)lua_tonumber(L, -2);
 	lua_remove(L, -2);
 	if (type == 0)
 	{
@@ -64,20 +67,45 @@ int Game::C_addToDraw(lua_State* L)
 		//button
 
 		const char* texture = lua_tostring(L, -1);
-		lua_pop(L, 1);
+
 
 		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 100, 100));
 		button->setImage(driver->getTexture(texture));
-		
-		button->setText(L"Button");
-		
 
+		button->setText(L"Button");
+
+		lua_pop(L, 1);
 		lua_pushlightuserdata(L, button);
 	}
-	else if(type == 2)
+	else if (type == 2)
 	{
 		//text
 
+		float x = (float)lua_tonumber(L, -5);
+		float y = (float)lua_tonumber(L, -4);
+		float x1 = (float)lua_tonumber(L, -3);
+		float y1 = (float)lua_tonumber(L, -2);
+
+
+
+
+		const char* text = lua_tostring(L, -1);
+		const size_t cSize = strlen(text) + 1;
+		wchar_t* wc = new wchar_t[cSize];
+		size_t outSize;
+		mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
+
+
+
+
+		gui::IGUIStaticText* statText = guienv->addStaticText(wc, core::recti(x, y, x1, y1));
+		delete[] wc;
+		statText->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
+		//device->getGUIEnvironment()->addf
+		statText->setTextRestrainedInside(false);
+		statText->setOverrideFont(font);
+		lua_pop(L, 5);
+		lua_pushlightuserdata(L, statText);
 	}
 
 	return 1;
@@ -92,9 +120,9 @@ int Game::C_removeFromDraw(lua_State* L)
 	case 0:
 		//mesh
 
-		scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
+		scene::IMeshSceneNode * node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
 		lua_pop(L, 1);
-		if(node != nullptr)
+		if (node != nullptr)
 			node->remove();
 
 		break;
@@ -107,7 +135,7 @@ int Game::C_setVisible(lua_State* L)
 
 	bool arg = lua_toboolean(L, -1);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -2);
-	if(node != nullptr)
+	if (node != nullptr)
 		node->setVisible(arg);
 	lua_pop(L, 2);
 	//get the parameter, a bool
@@ -126,12 +154,12 @@ int Game::C_loadStage(lua_State* L)
 	{
 		return 0;
 	}
-	
+
 	rf.read((char*)&stage, sizeof(Stage));
 
 	lua_createtable(L, 0, 1024);
 
-	for (int i = 0; i < stage.height*stage.width; i++)
+	for (int i = 0; i < stage.height * stage.width; i++)
 	{
 		std::string str = std::to_string(i + 1);
 		lua_pushnumber(L, stage.grid[i]);
@@ -149,14 +177,14 @@ int Game::C_saveStage(lua_State* L)
 	lua_pop(L, 1);
 	std::ofstream wf(fileName, std::ios::out | std::ios::binary);
 	Stage stage;
-	
+
 	stage.width = lua_tonumber(L, -1);
 	stage.height = lua_tonumber(L, -2);
 
 	lua_remove(L, -1);
 	lua_remove(L, -1);
 
-	for (int i = 0; i < stage.width*stage.height; i++)
+	for (int i = 0; i < stage.width * stage.height; i++)
 	{
 		std::string str = std::to_string(i + 1);
 		lua_pushstring(L, str.c_str());
@@ -176,8 +204,8 @@ int Game::C_setPosition(lua_State* L)
 	float y = (float)lua_tonumber(L, -2);
 	float z = (float)lua_tonumber(L, -1);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -4);
-	if(node)
-		node->setPosition(core::vector3df(x,y,z));
+	if (node)
+		node->setPosition(core::vector3df(x, y, z));
 	lua_pop(L, 4);
 	return 0;
 }
@@ -204,21 +232,21 @@ int Game::C_setRotation(lua_State* L)
 int Game::C_addCube(lua_State* L)
 {
 	int type = (int)lua_tonumber(L, -2);
-	
+
 
 	scene::IMeshSceneNode* node = smgr->addCubeSceneNode();
 	node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
-	
+
 	//scene::IMeshSceneNode* pi = (scene::IMeshSceneNode*)lua_newuserdata(L, sizeof(scene::IMeshSceneNode));
 	lua_pushlightuserdata(L, node);
 
-		
-	
+
+
 	return 1;
 }
 int Game::C_isKeyPressed(lua_State* L)
 {
-	int key = lua_tonumber(L,-1);
+	int key = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 	if (key == 1)
 	{
@@ -232,7 +260,7 @@ int Game::C_isKeyPressed(lua_State* L)
 	{
 		lua_pushboolean(L, eventRec.IsKeyDown(irr::EKEY_CODE(key)));
 	}
-	return 1; 
+	return 1;
 }
 int Game::C_setColor(lua_State* L)
 {
@@ -240,7 +268,7 @@ int Game::C_setColor(lua_State* L)
 	float g = (float)lua_tonumber(L, -2);
 	float b = (float)lua_tonumber(L, -1);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -4);
-	
+
 	lua_pop(L, 4);
 	return 0;
 }
@@ -277,6 +305,37 @@ int Game::C_setCamPos(lua_State* L)
 	camera->setPosition(pos);
 	return 0;
 }
+
+int Game::C_setCamTarget(lua_State* L)
+{
+	float x = (float)lua_tonumber(L, -3);
+	float y = (float)lua_tonumber(L, -2);
+	float z = (float)lua_tonumber(L, -1);
+
+	lua_pop(L, 3);
+	core::vector3df pos(x, y, z);
+	camera->setTarget(pos);
+	return 0;
+}
+int Game::C_setTexture(lua_State* L)
+{
+	const char* texture = lua_tostring(L, -1);
+	int type = lua_tonumber(L, -2);
+	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -3);
+
+	if (type == 0)
+	{
+		node->setMaterialTexture(0, driver->getTexture(texture));
+	}
+	else if (type == 1)
+	{
+		gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -3);
+		if (button != nullptr)
+			button->setImage(driver->getTexture(texture));
+	}
+	lua_pop(L, 3);
+	return 0;
+}
 int Game::C_setUIPos(lua_State* L)
 {
 	int x = (int)lua_tonumber(L, -2);
@@ -301,11 +360,29 @@ int Game::C_getDeltaTime(lua_State* L)
 	lua_pushnumber(L, deltaTime);
 	return 1;
 }
+int Game::C_setText(lua_State* L)
+{
+	const char* text = lua_tostring(L, -1);
+	const size_t cSize = strlen(text) + 1;
+	wchar_t* wc = new wchar_t[cSize];
+	size_t outSize;
+	mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
+
+
+	gui::IGUIStaticText* node = (gui::IGUIStaticText*)lua_touserdata(L, -2);
+	if (node != nullptr)
+		node->setText(wc);
+	lua_pop(L, 2);
+	//get the parameter, a bool
+	//get the parameter, a int
+	//lookup with the index parameter in the array of nodes and set visible
+	return 0;
+}
 void Game::render()
 {
 	if (device->isWindowActive())
 	{
-		
+
 
 		//Draw or Render
 		driver->beginScene(true, true, irr::video::SColor(255, 0, 0, 200));
@@ -331,10 +408,22 @@ void Game::initialize()
 	this->driver = device->getVideoDriver();
 	this->smgr = device->getSceneManager();
 	this->guienv = device->getGUIEnvironment();
+	this->geomentryCreator = smgr->getGeometryCreator();
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
 	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
-	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 100, 0));
+	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 100, 0));
+	font = device->getGUIEnvironment()->getFont("myfont.xml");
+
+	scene::IMesh* plane = geomentryCreator->createPlaneMesh(irr::core::dimension2d<irr::f32>(100, 100), irr::core::dimension2d<irr::u32>(100, 100));
+	//irr::scene::ISceneNode* cube = smgr->addCubeSceneNode(20);
+	//cube->render();
+
+	//scene::ISceneNode* ground = smgr->addMeshSceneNode(plane);
+	//ground->setPosition(core::vector3df(0, 10000, 0));
+	plane->setMaterialFlag(video::EMF_LIGHTING, false);
+
+
 }
 
 void Game::update()
@@ -350,7 +439,16 @@ void Game::update()
 			std::cout << "error";
 		}
 	}
-	luaL_dofile(L, "LuaScripts/update.lua");
+	lua_getglobal(L, "Update");
+	if (lua_type(L, -1) == LUA_TFUNCTION)
+	{
+		int numArgs = 0;
+		lua_pcall(L, numArgs, 0, 0);//removes function from stack
+	}
+	else
+	{
+		luaL_error(L, "unknown script function %s", "Update");
+	}
 }
 
 void Game::initLua()
@@ -379,13 +477,24 @@ void Game::initLua()
 	lua_setglobal(L, "C_getDeltaTime");
 	lua_pushcfunction(L, this->C_removeFromDraw);
 	lua_setglobal(L, "C_removeFromDraw");
-	int error = luaL_loadfile(L, "E:/Lua_Irrlicht_BTH_template/Lua_Irrlicht_BTH_template/LuaScripts/test2.lua"); 
+	lua_pushcfunction(L, this->C_setRotation);
+	lua_setglobal(L, "C_setRotation");
+	lua_pushcfunction(L, this->C_setText);
+	lua_setglobal(L, "C_setText");
+	lua_pushcfunction(L, this->C_setCamTarget);
+	lua_setglobal(L, "C_setCamTarget");
+	lua_pushcfunction(L, this->C_setUIPos);
+	lua_setglobal(L, "C_setUIPos");
+	lua_pushcfunction(L, this->C_setTexture);
+	lua_setglobal(L, "C_setTexture");
+	int error = luaL_loadfile(L, "E:/Lua_Irrlicht_BTH_template/Lua_Irrlicht_BTH_template/LuaScripts/test2.lua");
 	if (error)
 	{
 		std::cout << "error";
 	}
 
 	luaL_dofile(L, "LuaScripts/Init.lua");
+	luaL_dofile(L, "LuaScripts/update.lua");
 
 
 }

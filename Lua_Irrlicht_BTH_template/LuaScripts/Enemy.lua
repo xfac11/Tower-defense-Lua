@@ -7,8 +7,11 @@ startIndex = 1, endIndex = 0, hp = 100}
 
 function Enemy:new(c)
     c = c or {}
+    setmetatable(c, self)
     self.__index = self
-    return setmetatable(c, self)
+    
+    c.obj = Gameobject:new()
+    return c
 end
 
 function Enemy:update(deltatime)

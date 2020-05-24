@@ -44,7 +44,7 @@ public:
 			case EMIE_LMOUSE_LEFT_UP:
 				MouseState.leftButtonDown = false;
 				break;
-				
+
 			case EMIE_RMOUSE_PRESSED_DOWN:
 				MouseState.rightButtonDown = true;
 				break;
@@ -56,7 +56,7 @@ public:
 			case EMIE_MOUSE_MOVED:
 				MouseState.position.X = event.MouseInput.X;
 				MouseState.position.Y = event.MouseInput.Y;
-					break;
+				break;
 
 			default:
 				break;
@@ -79,7 +79,7 @@ public:
 	{
 		return KeyIsDown[keyCode];
 	}
-	
+
 	MyEventReceiver()
 	{
 		for (irr::u32 i = 0; i < irr::KEY_KEY_CODES_COUNT; ++i)
@@ -89,7 +89,7 @@ public:
 private:
 	// We use this array to store the current state of each key
 	bool KeyIsDown[irr::KEY_KEY_CODES_COUNT];
-    
+
 };
 struct Stage
 {
@@ -129,9 +129,12 @@ public:
 	static int C_setColor(lua_State* L);
 	static int C_getMousePos3D(lua_State* L);
 	static int C_setCamPos(lua_State* L);
+	static int C_setCamTarget(lua_State* L);
+	static int C_setTexture(lua_State* L);
 	static int C_setUIPos(lua_State* L);
 	static int C_isButtonPressed(lua_State* L);
 	static int C_getDeltaTime(lua_State* L);
+	static int C_setText(lua_State* L);
 	lua_State* L;
 private:
 	static MyEventReceiver eventRec;
@@ -140,10 +143,13 @@ private:
 	static irr::gui::IGUIEnvironment* guienv;
 	static irr::IrrlichtDevice* device;
 	static irr::scene::ICameraSceneNode* camera;
+	const static irr::scene::IGeometryCreator* geomentryCreator;
 	static float deltaTime;
+
+	static gui::IGUIFont* font;
 	void render();//C++
 	void initialize();
 	void update();//LUA
 	void initLua();
-	
+
 };

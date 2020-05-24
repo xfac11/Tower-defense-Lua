@@ -37,6 +37,24 @@ function Update()
     end
     
     objButton:update()
+    
+    arg2 = C_isButtonPressed(button)
+    
+    if C_isButtonPressed(button) and isPressed == false then
+    
+        
+        local pos = Vector3:new(5, 0, 0)
+        if COINS >= 10 then
+            bulletHandler:fireBullet(math.random(1,2), pos, 20, 50)
+            COINS = COINS - 5
+        end
+        
+        isPressed = true
+        print("pressed")
+    elseif isPressed and C_isButtonPressed(button) == false then
+        print("ispreed")
+        isPressed = false
+    end
    
     bulletHandler:updateBullets(deltatime)
     for k,v in pairs(enemies) do
