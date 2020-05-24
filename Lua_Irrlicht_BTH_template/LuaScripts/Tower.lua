@@ -1,22 +1,48 @@
-local Vector3 = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Vector3.lua")
-local Gameobject = dofile("Lua_Irrlicht_BTH_template/LuaScripts/Gameobject.lua")
-local Tower = {obj = Gameobject:new(), from = Vector3:new(), to = Vector3:new(), check = 1, waypoints = 0, 
-startIndex = 1, endIndex = 0, dmg = 20, attackSpeed = 1.0}
+local Vector3 = dofile("LuaScripts/Vector3.lua")
+local Gameobject = dofile("LuaScripts/Gameobject.lua")
+local Tower = {obj = Gameobject:new(), dmg = 20, attackSpeed = 1, range = 40, target = -1, totalTime = 0, x = -1, y = -1}
 
 function Tower:new(c)
     c = c or {}
+    setmetatable(c, self)
     self.__index = self
-    return setmetatable(c, self)
+
+    c.obj = Gameobject:new()
+    return c
 end
 
 function Tower:update(deltatime)
     self.totalTime = self.totalTime + deltatime
     if self.totalTime > (1 / self.attackSpeed) then
         self.totalTime = 0
-        --shoot 
-        return true
+        if self.target~=-1 then 
+            if enemies[self.target] == nil then
+                self.target = -1
+            else
+                local toEnemy = enemies[self.target].obj.position:sub(self.obj.position)
+                local lengthTo = toEnemy:length()
+                if lengthTo > self.range then
+                    self.target = -1 
+                else
+                    print("Target: ",self.target)
+                    bulletHandler:fireBullet(self.target, self.obj.position, self.dmg, 100)
+                end
+            end
+        end
     end
-    return false
+    if self.target == -1 then 
+        for i=1,nrOfEnemies do
+            if enemies[i] ~= nil then
+                local toEnemy = enemies[i].obj.position:sub(self.obj.position)
+                local lengthTo = toEnemy:length()
+                
+                if lengthTo <= self.range then
+                    self.target = i 
+                    break
+                end
+            end
+        end
+    end
 end
 
 

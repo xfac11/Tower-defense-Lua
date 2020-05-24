@@ -57,7 +57,7 @@ int Game::C_addToDraw(lua_State* L)
 
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
 		node->setMaterialTexture(0, driver->getTexture("3DObjects/cube2.tga"));
-		//node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+		node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 		//scene::IMeshSceneNode* pi = (scene::IMeshSceneNode*)lua_newuserdata(L, sizeof(scene::IMeshSceneNode));
 		lua_pushlightuserdata(L, node);
 
@@ -71,9 +71,9 @@ int Game::C_addToDraw(lua_State* L)
 
 		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 100, 100));
 		button->setImage(driver->getTexture(texture));
-
-		button->setText(L"Button");
-
+		//button->setScaleImage(true);
+		button->setOverrideFont(font);
+		
 		lua_pop(L, 1);
 		lua_pushlightuserdata(L, button);
 	}
@@ -115,17 +115,33 @@ int Game::C_removeFromDraw(lua_State* L)
 {
 	int type = (int)lua_tonumber(L, -2);
 	lua_remove(L, -2);
-	switch (type)
+	if (type == 0)
 	{
-	case 0:
 		//mesh
 
-		scene::IMeshSceneNode * node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
+		scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
 		lua_pop(L, 1);
 		if (node != nullptr)
 			node->remove();
 
-		break;
+	}
+	else if (type == 1)
+	{
+		//Button
+		gui::IGUIButton * button = (gui::IGUIButton*)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		if (button != nullptr)
+			button->remove();
+
+	}
+	else if (type == 2)
+	{
+		gui::IGUIStaticText * text = (gui::IGUIStaticText*)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		if (text != nullptr)
+			text->remove();
+		//text
+		
 	}
 	return 0;
 }
@@ -412,9 +428,9 @@ void Game::initialize()
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
 	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
-	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 100, 0));
+	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 150, 0))->setRadius(200);
 	font = device->getGUIEnvironment()->getFont("myfont.xml");
-
+	
 	scene::IMesh* plane = geomentryCreator->createPlaneMesh(irr::core::dimension2d<irr::f32>(100, 100), irr::core::dimension2d<irr::u32>(100, 100));
 	//irr::scene::ISceneNode* cube = smgr->addCubeSceneNode(20);
 	//cube->render();

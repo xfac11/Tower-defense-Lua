@@ -21,11 +21,23 @@ function BulletHandler:fireBullet(enemyID, pos, dmg, speed)
     self.bullets[self.nrOfBullets].obj:addToDraw()
     self.bullets[self.nrOfBullets]:setPosition(pos.x, pos.y, pos.z)
     self.bullets[self.nrOfBullets]:setScale(0.1, 0.1, 0.1)
+    C_setTexture(self.bullets[self.nrOfBullets].obj.typePtr, 0, "3DObjects/waypoint.tga")
+
 end
 
 function BulletHandler:updateBullets(deltaTime)
     
     for i=1,self.nrOfBullets do
+        if enemies[self.bullets[i].enemyID] == nil then 
+            --remove bullet
+            self.bullets[i].obj:removeFromDraw()
+            local temp = self.bullets[self.nrOfBullets]
+            self.bullets[self.nrOfBullets] = self.bullets[i]
+            self.bullets[i] = temp
+            self.bullets[self.nrOfBullets] = nil
+            self.nrOfBullets = self.nrOfBullets - 1
+            break;
+        end
         local vec = enemies[self.bullets[i].enemyID].obj.position:sub(self.bullets[i].obj.position)
         local vecNor = vec:normalize()
         self.bullets[i].obj:move(vecNor.x * self.bullets[i].speed * deltaTime, vecNor.y * self.bullets[i].speed * deltaTime, vecNor.z * self.bullets[i].speed * deltaTime)
@@ -47,7 +59,6 @@ function BulletHandler:collision()
             self.bullets[i] = temp
             self.bullets[self.nrOfBullets] = nil
             self.nrOfBullets = self.nrOfBullets - 1
-            COINS = COINS + 10
         end
     end
 end

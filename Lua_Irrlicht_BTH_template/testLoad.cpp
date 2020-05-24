@@ -15,8 +15,8 @@ int main()
 {
 	Game game;
 	/*
-	En bra tumregel f?r att separera logik fr?n C++ ?r att t?nka p? att C++-delen ska kunna anv?ndas till olika typer av spel.
-	Det ?r i Lua vi faktiskt skapar spelet. I verkligheten ?r det sj?lvklart inte s? extremt, men i uppgiften g?r vi s? f?r tydlighetens skull
+	En bra tumregel får att separera logik från C++ är att tänka på att C++-delen ska kunna användas till olika typer av spel.
+	Det är i Lua vi faktiskt skapar spelet. I verkligheten är det självklart inte så extremt, men i uppgiften gör vi så för tydlighetens skull
 	*/
 	//std::thread conThread(ConsoleThread, game.L);
 

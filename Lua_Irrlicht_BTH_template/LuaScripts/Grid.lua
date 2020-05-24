@@ -4,8 +4,12 @@ local Grid = {width = 0, height = 0, theGrid = {}}
 
 function Grid:new(c)
     c = c or {}
+    setmetatable(c, self)
     self.__index = self
-    return setmetatable(c, self)
+
+    c.theGrid = {}
+
+    return c
 end
 
 function Grid:create(width, height)
@@ -15,7 +19,7 @@ function Grid:create(width, height)
     for x=1,width do
         self.theGrid[x] = {}
         for y=1,height do
-            table.insert(self.theGrid[x], 0)
+            table.insert(self.theGrid[x], 1)
         end
     end
 end
@@ -36,16 +40,18 @@ end
 function Grid:insert(value, x, y)
     if self:isValid(x, y) then
         self.theGrid[x][y] = value
+        return true
     end
 end
 
 function Grid:print()
     local gridString = ""
-    for y=1,self.width do
-        for x=1,self.height do
+    for x=1,self.width do
+        for y=1,self.height do
             gridString = gridString .. self.theGrid[x][y] .. " "
         end
         gridString = gridString .. "\n"
+        print("Print grid")
     end
     print(gridString)
 end

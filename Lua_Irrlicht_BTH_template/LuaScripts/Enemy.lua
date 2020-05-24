@@ -30,7 +30,7 @@ function Enemy:update(deltatime)
             self.from = self.waypoints[self.check]--one for every enemy
             self.to = self.waypoints[self.check + 1]--one for every enemy
         end
-
+        
         self.obj:move(10 * toNext.x * deltatime, 10 * toNext.y * deltatime, 10 * toNext.z * deltatime)
     end
     

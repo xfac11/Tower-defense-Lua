@@ -9,7 +9,6 @@ local Vector3 = dofile("LuaScripts/Vector3.lua")
 local Gameobject = {position = Vector3:new(0, 0, 0), rotation = Vector3:new(0, 0, 0), model = "", drawType = -1, typePtr = 0 }
 
 function Gameobject:new(c)
-    print("start of obj new")
     c = c or {}
     self.__index = self
     setmetatable(c, self)
@@ -20,15 +19,11 @@ function Gameobject:new(c)
 end
 
 function Gameobject:addToDraw()
-    print("asd2.3")
     self.typePtr = C_addToDraw(0, self.model)
-    print("added to draw")
 end
 
 function Gameobject:removeFromDraw()
-    
     self.typePtr = C_removeFromDraw(0, self.typePtr)
-    print("removed from draw")
 end
 
 function Gameobject:move(x, y, z)

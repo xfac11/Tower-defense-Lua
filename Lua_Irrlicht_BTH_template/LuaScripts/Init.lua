@@ -7,81 +7,255 @@ Enemy = dofile("LuaScripts/Enemy.lua")
 Bullet = dofile("LuaScripts/Bullet.lua")
 BulletHandler = dofile("LuaScripts/BulletHandler.lua")
 Button = dofile("LuaScripts/Button.lua")
-C_setCamPos(20, 100, -20)
-grid = Grid:new()
+Tower = dofile("LuaScripts/Tower.lua")
+print("s")
+MODE_C = true
+MODE_WP = false
+STATE = 0 
+OLD_STATE = 0
+STATE_EDIT = 0
+STATE_GAME = 1
+GAME_OBJ = {enemies = {}, towers = {}}
+UI = {buttons = {}, text = {}}
+GAME_UI = {buttons = {}, text = {}}
+EDIT_UI = {buttons = {}, text = {}}
+MODETEXT = C_addToDraw(1200, 600, 1300, 700, 2, "")
+PLAYER_HP = 100
+function loadGrid(fileName)
+	stage, width, height = C_loadStage(fileName)
+    local grid = Grid:new()
+	grid:create(width, height)
+	local index = 1
+	for x=1,width do
+        for y=1,height do
+			grid:insert(math.tointeger(stage[tostring(index)]),x,y)
+			index = index + 1
+			
+		end
+	end 
+	return grid
+end
+
+function saveGrid(grid, height, width, fileName)
+	local stageGrid = grid:create1d()
+	C_saveStage(stageGrid, height, width, fileName)
+end
+
+
+
+
+
+--Level editor
 posX = -1
 posY = -1
-arg2 = false
-isPressed = false
-grid:create(10, 10)
-C_setCamTarget(-20, 0, 0)
-print("asdasd")
+gridObj = Grid:new()
+grid = loadGrid("Stages/stage1.lvl")
+gridObj:create(grid.width, grid.height)
 
+nrOfWP = 0 
+waypoints = {}
+
+selectObj = Gameobject:new()
+selectObj.model = "3DObjects/cube2.obj"
+selectObj.drawType = 0
+selectObj:addToDraw()
+selectObj:setScale(0.2, 3, 0.2)
+C_setTexture(selectObj.typePtr, 0, "3DObjects/cube2Select.tga")
+
+
+--Setup objects in world for editor or game
 for x=1,grid.width do
     for y=1,grid.height do
-        local node = Gameobject:new()
-        node.model = "3DObjects/cube2.obj"
-        node.drawType = 0
-        node:addToDraw()
-        node:setPosition(x * 13, 0, y * 13)
-        grid:insert(node, x, y)
+        if grid:cell(x, y) == 1 then--place cube
+            local node = Gameobject:new()
+            node.model = "3DObjects/cube2.obj"
+            node.drawType = 0
+            node:addToDraw()
+            node:setPosition(x * 13, 0, y * 13)
+            gridObj:insert(node, x, y)
+        elseif grid:cell(x, y) >= 10 then --place waypoint. Only for edit mode
+            local index = (grid:cell(x, y) - 10) + 1
+            waypoints[index] = Vector3:new(x * 13, 0, y * 13)
+            nrOfWP = nrOfWP + 1
+            local node = Gameobject:new()
+            node.model = "3DObjects/cube2.obj"
+            node.drawType = 0
+            node:addToDraw()
+            node:setPosition(x * 13, 0, y * 13)
+            node:setScale(0.2, 0.2, 0.2)
+            C_setTexture(node.typePtr, 0, "3DObjects/waypoint.tga")
+            gridObj:insert(node, x, y)
+        end
     end
 end
 
-print("sd")
-print("done")
-button = C_addToDraw(1, "3DObjects/cube2Select.tga")
+--Camera
+C_setCamTarget(gridObj:cell(6,6).position.x,gridObj:cell(6,6).position.y,gridObj:cell(6,6).position.z)
+C_setCamPos(gridObj:cell(6,6).position.x, 120, gridObj:cell(6,6).position.z)
+--UI
+changeEM = Button:new()
+changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
+changeEM:setPosition(0,400)
+changeEM:setFunction(function ()
+if MODE_WP then
+    MODE_WP = false
+    MODE_C = true
+elseif MODE_C then
+    MODE_C = false
+    MODE_WP = true
+end
+
+end)
+
+
 objButton = Button:new()
-objButton:addToDraw("3DObjects/cube2Select.tga")
-objButton:setPosition(400,400)
+objButton:addToDraw("3DObjects/buttonMode.tga")
+objButton:setPosition(1080,0)
 objButton:setFunction(function ()
-    local pos = Vector3:new(5, 0, 0)
-    if COINS >= 10 then
-        bulletHandler:fireBullet(math.random(1,2), pos, 20, 50)
-        COINS = COINS - 5
+    for k,v in pairs(UI.buttons) do
+        v:removeFromDraw()
+    end
+    if STATE == STATE_EDIT then
+        UI = GAME_UI
+        STATE = STATE_GAME
+    elseif STATE == STATE_GAME then
+        UI = EDIT_UI
+        STATE = STATE_EDIT
+    end
+    for k,v in pairs(UI.buttons) do
+        v:addToDrawT()
     end
 end)
-text = C_addToDraw(200, 200, 300, 220, 2, "Coins:123")
+
+
+resetButton = Button:new()
+resetButton:addToDraw("3DObjects/buttonReset.tga")
+resetButton:setPosition(0,600)
+resetButton:setFunction(function ()
+    print("Reset", grid.width, grid.height)
+    for x=1,grid.width do
+        for y=1,grid.height do
+            if grid:cell(x,y) ~= 0 then
+                gridObj:cell(x, y):removeFromDraw()
+            end
+            grid:insert(1, x, y)
+            local node = Gameobject:new()
+                node.model = "3DObjects/cube2.obj"
+                node.drawType = 0
+                node:addToDraw()
+                node:setPosition(x * 13, 0, y * 13)
+                gridObj:insert(node, x, y)
+        end
+    end
+    waypoints = {}
+    nrOfWP = 0
+end)
+
+saveButton = Button:new()
+saveButton:addToDraw("3DObjects/buttonSave.tga")
+saveButton:setPosition(0,0)
+saveButton:setFunction(function ()
+    saveGrid(grid, grid.height, grid.width, "Stages/stage1.lvl")
+end)
+
+
+
+UI.buttons["objButton"] = objButton
+
+UI.buttons["ChangeMode"] = changeEM
+UI.buttons["resetButton"] = resetButton
+UI.buttons["saveButton"] = saveButton
+
+EDIT_UI.buttons["ChangeMode"] = changeEM
+EDIT_UI.buttons["resetButton"] = resetButton
+EDIT_UI.buttons["saveButton"] = saveButton
+EDIT_UI.buttons["objButton"] = objButton
+GAME_UI.buttons["resetButton"] = resetButton
+GAME_UI.buttons["objButton"] = objButton
 COINS = 20
-C_setText(text,tostring(COINS))
+
+coinsText = C_addToDraw(120, 120, 150, 150, 2, "Coins:123")
+UI.text["coinsText"] = coinsText
+C_setText(coinsText,"$"..tostring(COINS))
 isPressed = false
 isPressed2 = false
-nrOfWP = 6 
-waypoints = {}
-waypoints[1] = Vector3:new(0, 1, 0)
-waypoints[2] = Vector3:new(0, 1, 20)
-waypoints[3] = Vector3:new(10, 1, 10)
-waypoints[4] = Vector3:new(20, 1, 10)
-waypoints[5] = Vector3:new(20, 1, 20)
-waypoints[6] = Vector3:new(30 ,1, 20)
-for k,v in pairs(waypoints) do 
-    local node = Gameobject:new()
-    node.model = "3DObjects/cube2.obj"
-    node.drawType = 0
-    node:addToDraw()
-    node:setPosition(waypoints[k].x,waypoints[k].y,waypoints[k].z)
-    node:setScale(0.2,0.2,0.2)
+
+hpText = C_addToDraw(120,160,160,200,2,"HP:")
+C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
+
+--Game
+towers = {}
+enemies = {}--in the world updating and walking towards waypoints
+nrOfEnemies = 0
+enemyQueue = {}--waiting to go in the world( in table enemies)
+enmiesInQueue = 0
+queueTime = 1 
+waveNr = 1
+totalTime = 0
+function nextWave()
+    --Start the next wave
+    if nrOfEnemies == 0 then     
+        for i=1,waveNr*5 do
+            local e = Enemy:new()
+            e.obj.model = "3DObjects/robot.obj"
+            e.obj.drawType = 0
+            e.waypoints = waypoints
+            e.endIndex = nrOfWP
+            e.from:insert(waypoints[1].x, waypoints[1].y, waypoints[1].z)
+            e.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
+            enemyQueue[i] = e
+        end
+        enmiesInQueue = waveNr * 5
+        waveNr = waveNr + 1
+    end
 end
-
-e1 = Enemy:new()
-e1.obj.model = "3DObjects/robot.obj"
-e1.obj.drawType = 0
-e1.obj:addToDraw()
-e1.obj:setPosition(0, 1, 0)
-e1.waypoints = waypoints
-e1.endIndex = 6
-e1.from:insert(waypoints[1].x, waypoints[1].y, waypoints[1].z)
-e1.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
-
-e2 = Enemy:new()
-e2.obj.model = "3DObjects/robot.obj"
-e2.obj.drawType = 0
-e2.obj:addToDraw()
-e2.obj:setPosition(0, 1, 0)
-e2.waypoints = waypoints
-e2.endIndex = 6
-e2.from:insert(waypoints[1].x, waypoints[1].y, waypoints[1].z)
-e2.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
-enemies = {e1, e2}
+function updateQueue(deltaTime)
+    if enmiesInQueue > 0 then
+        totalTime = totalTime + deltaTime
+        if totalTime >= queueTime then
+            totalTime = 0
+            local e = enemyQueue[enmiesInQueue]
+            e.obj:addToDraw()
+            print(enmiesInQueue)
+            e.obj:setPosition(waypoints[1].x, waypoints[1].y, waypoints[1].z)
+            nrOfEnemies = nrOfEnemies + 1
+            enemies[nrOfEnemies] = e
+            enemyQueue[enmiesInQueue] = nil
+            enmiesInQueue = enmiesInQueue - 1
+        end
+    end
+end
+function updateEnemies(deltaTime)
+    local nrOfNil = 0
+    for i=1,nrOfEnemies do
+        if enemies[i] ~= nil then
+            if enemies[i].check == enemies[i].endIndex  then
+                enemies[i].obj:removeFromDraw()
+                enemies[i] = nil
+                PLAYER_HP = PLAYER_HP - 5
+                print(PLAYER_HP)
+            elseif enemies[i].hp <= 0 then 
+                enemies[i].obj:removeFromDraw()
+                enemies[i] = nil
+                COINS = COINS + 10
+            end
+        else
+            nrOfNil = nrOfNil + 1
+        end
+    end
+    if nrOfNil == nrOfEnemies then
+        nrOfEnemies = 0
+    end
+end
+startButton = Button:new()
+startButton.texture = "3DObjects/buttonStart.tga"
+--startButton:addToDraw("3DObjects/buttonStart.tga")
+startButton:setPosition(0,0)
+startButton:setFunction(function ()
+    --Start next wave
+    nextWave()
+    print("s")
+end)
+GAME_UI.buttons["startButton"] = startButton
 bulletHandler = BulletHandler:new()
 
