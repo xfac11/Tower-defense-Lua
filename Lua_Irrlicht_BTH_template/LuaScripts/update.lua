@@ -54,7 +54,6 @@ function EditMode()
             node.model = "3DObjects/cube2.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
-                --print("Inserted node in", posX, posY)
                 gridObj:cell(posX, posY):addToDraw()
                 gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
             end
@@ -74,10 +73,7 @@ function EditMode()
        
         
 
-        --gridObj:cell(posX, posY):removeFromDraw()
         
-        --nrOfWP = nrOfWP + 1
-        --waypoints[nrOfWP] = Vector3:new(posX * 13, 0, posY * 13)
         if grid:cell(posX, posY) == 0 then--There is not a cube here so put waypoint
             local value = nrOfWP + 10 --ex order: 0 + 10 = 10 first WP. To get index (value - 10) + 1
             nrOfWP = nrOfWP + 1
@@ -87,7 +83,6 @@ function EditMode()
             node.model = "3DObjects/cube2.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
-                --print("Inserted node in", posX, posY)
                 gridObj:cell(posX, posY):addToDraw()
                 gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
                 gridObj:cell(posX, posY):setScale(0.2,0.2,0.2)
@@ -95,7 +90,6 @@ function EditMode()
             end
         end       
         isPressed = true
-        --[[--]]
     elseif isPressed and C_isKeyPressed(Key.MOUSE_LEFT) == false then
         isPressed = false
     end

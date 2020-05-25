@@ -1,4 +1,3 @@
-print("In init")
 Key = dofile("LuaScripts/KeyboardKeys.lua")
 Gameobject = dofile("LuaScripts/Gameobject.lua")
 Grid = dofile("LuaScripts/Grid.lua")
@@ -11,10 +10,8 @@ Tower = dofile("LuaScripts/Tower.lua")
 MODE_C = true
 MODE_WP = false
 STATE = 0 
-OLD_STATE = 0
 STATE_EDIT = 0
 STATE_GAME = 1
-GAME_OBJ = {enemies = {}, towers = {}}
 UI = {buttons = {}, text = {}}
 GAME_UI = {buttons = {}, text = {}}
 EDIT_UI = {buttons = {}, text = {}}
@@ -95,7 +92,6 @@ end
 C_setCamTarget(6*13,0,6*13)
 C_setCamPos(6*13, 120, 6*13)
 --UI
-print("ssc")
 
 changeEM = Button:new()
 changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
@@ -122,7 +118,6 @@ resetButton = Button:new()
 resetButton:addToDraw("3DObjects/buttonReset.tga")
 resetButton:setPosition(0,600)
 resetButton:setFunction(function ()
-    print("Reset", grid.width, grid.height)
     for x=1,grid.width do
         for y=1,grid.height do
             if grid:cell(x,y) ~= 0 then
@@ -211,7 +206,6 @@ function updateQueue(deltaTime)
             e.obj:setPosition(waypoints[1].x, waypoints[1].y, waypoints[1].z)
             nrOfEnemies = nrOfEnemies + 1
             enemies[nrOfEnemies] = e
-            print("inserted")
             enemyQueue[enemiesInQueue] = nil
             enemiesInQueue = enemiesInQueue - 1
         end
@@ -226,7 +220,6 @@ function updateEnemies(deltaTime)
                 enemies[i].obj:removeFromDraw()
                 enemies[i] = nil
                 PLAYER_HP = PLAYER_HP - 5
-                print(PLAYER_HP)
             elseif enemies[i].hp <= 0 then 
                 enemies[i].obj:removeFromDraw()
                 enemies[i] = nil
@@ -247,7 +240,6 @@ startButton:setPosition(0,0)
 startButton:setFunction(function ()
     --Start next wave
     nextWave()
-    print("s")
 end)
 GAME_UI.buttons["startButton"] = startButton
 bulletHandler = BulletHandler:new()

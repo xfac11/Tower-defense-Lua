@@ -28,7 +28,6 @@ function Bullet:setPosition(x, y, z)
     self.obj:setPosition(x,y,z)
 end
 function Bullet:addToDraw()
-    print("addBulletdraw")
     self.obj:addToDraw()
 end
 

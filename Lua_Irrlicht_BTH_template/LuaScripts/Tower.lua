@@ -23,9 +23,7 @@ function Tower:update(deltatime)
                 local lengthTo = toEnemy:length()
                 if lengthTo > self.range then
                     self.target = -1 
-                    print("Too far away")
                 else
-                    print("Target: ",self.target)
                     bulletHandler:fireBullet(self.target, self.obj.position, self.dmg, 100)
                 end
             end
