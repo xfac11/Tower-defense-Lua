@@ -58,7 +58,6 @@ int Game::C_addToDraw(lua_State* L)
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
 		node->setMaterialTexture(0, driver->getTexture("3DObjects/cube2.tga"));
 		node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
-		//scene::IMeshSceneNode* pi = (scene::IMeshSceneNode*)lua_newuserdata(L, sizeof(scene::IMeshSceneNode));
 		lua_pushlightuserdata(L, node);
 
 	}
@@ -101,7 +100,6 @@ int Game::C_addToDraw(lua_State* L)
 		gui::IGUIStaticText* statText = guienv->addStaticText(wc, core::recti(x, y, x1, y1));
 		delete[] wc;
 		statText->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
-		//device->getGUIEnvironment()->addf
 		statText->setTextRestrainedInside(false);
 		statText->setOverrideFont(font);
 		lua_pop(L, 5);
@@ -154,9 +152,6 @@ int Game::C_setVisible(lua_State* L)
 	if (node != nullptr)
 		node->setVisible(arg);
 	lua_pop(L, 2);
-	//get the parameter, a bool
-	//get the parameter, a int
-	//lookup with the index parameter in the array of nodes and set visible
 	return 0;
 }
 
@@ -253,7 +248,6 @@ int Game::C_addCube(lua_State* L)
 	scene::IMeshSceneNode* node = smgr->addCubeSceneNode();
 	node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
-	//scene::IMeshSceneNode* pi = (scene::IMeshSceneNode*)lua_newuserdata(L, sizeof(scene::IMeshSceneNode));
 	lua_pushlightuserdata(L, node);
 
 
@@ -389,9 +383,6 @@ int Game::C_setText(lua_State* L)
 	if (node != nullptr)
 		node->setText(wc);
 	lua_pop(L, 2);
-	//get the parameter, a bool
-	//get the parameter, a int
-	//lookup with the index parameter in the array of nodes and set visible
 	return 0;
 }
 void Game::render()
@@ -400,7 +391,6 @@ void Game::render()
 	{
 
 
-		//Draw or Render
 		driver->beginScene(true, true, irr::video::SColor(255, 0, 0, 200));
 
 
@@ -432,11 +422,6 @@ void Game::initialize()
 	font = device->getGUIEnvironment()->getFont("myfont.xml");
 	
 	scene::IMesh* plane = geomentryCreator->createPlaneMesh(irr::core::dimension2d<irr::f32>(100, 100), irr::core::dimension2d<irr::u32>(100, 100));
-	//irr::scene::ISceneNode* cube = smgr->addCubeSceneNode(20);
-	//cube->render();
-
-	//scene::ISceneNode* ground = smgr->addMeshSceneNode(plane);
-	//ground->setPosition(core::vector3df(0, 10000, 0));
 	plane->setMaterialFlag(video::EMF_LIGHTING, false);
 
 
