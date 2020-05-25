@@ -156,7 +156,6 @@ EDIT_UI.buttons["ChangeMode"] = changeEM
 EDIT_UI.buttons["resetButton"] = resetButton
 EDIT_UI.buttons["saveButton"] = saveButton
 EDIT_UI.buttons["objButton"] = objButton
-GAME_UI.buttons["resetButton"] = resetButton
 GAME_UI.buttons["objButton"] = objButton
 COINS = 20
 
@@ -235,7 +234,6 @@ function updateEnemies(deltaTime)
 end
 startButton = Button:new()
 startButton.texture = "3DObjects/buttonStart.tga"
---startButton:addToDraw("3DObjects/buttonStart.tga")
 startButton:setPosition(0,0)
 startButton:setFunction(function ()
     --Start next wave
