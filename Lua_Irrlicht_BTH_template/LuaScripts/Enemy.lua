@@ -17,7 +17,7 @@ end
 function Enemy:update(deltatime)
     if self.hp > 0 then
         -- body
-    
+
         local toNext = self.to:sub(self.from)
         toNext = toNext:normalize()
 

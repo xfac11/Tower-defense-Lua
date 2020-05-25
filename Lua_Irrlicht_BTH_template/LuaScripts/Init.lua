@@ -8,7 +8,6 @@ Bullet = dofile("LuaScripts/Bullet.lua")
 BulletHandler = dofile("LuaScripts/BulletHandler.lua")
 Button = dofile("LuaScripts/Button.lua")
 Tower = dofile("LuaScripts/Tower.lua")
-print("s")
 MODE_C = true
 MODE_WP = false
 STATE = 0 
@@ -71,8 +70,10 @@ for x=1,grid.width do
             node.model = "3DObjects/cube2.obj"
             node.drawType = 0
             node:addToDraw()
-            node:setPosition(x * 13, 0, y * 13)
+            node:setPosition(x * 13, -10, y * 13)
+            node:setScale(1,0.5,1)
             gridObj:insert(node, x, y)
+            
         elseif grid:cell(x, y) >= 10 then --place waypoint. Only for edit mode
             local index = (grid:cell(x, y) - 10) + 1
             waypoints[index] = Vector3:new(x * 13, 0, y * 13)
@@ -84,15 +85,18 @@ for x=1,grid.width do
             node:setPosition(x * 13, 0, y * 13)
             node:setScale(0.2, 0.2, 0.2)
             C_setTexture(node.typePtr, 0, "3DObjects/waypoint.tga")
+            
             gridObj:insert(node, x, y)
         end
     end
 end
 
 --Camera
-C_setCamTarget(gridObj:cell(6,6).position.x,gridObj:cell(6,6).position.y,gridObj:cell(6,6).position.z)
-C_setCamPos(gridObj:cell(6,6).position.x, 120, gridObj:cell(6,6).position.z)
+C_setCamTarget(6*13,0,6*13)
+C_setCamPos(6*13, 120, 6*13)
 --UI
+print("ssc")
+
 changeEM = Button:new()
 changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
 changeEM:setPosition(0,400)
@@ -111,21 +115,7 @@ end)
 objButton = Button:new()
 objButton:addToDraw("3DObjects/buttonMode.tga")
 objButton:setPosition(1080,0)
-objButton:setFunction(function ()
-    for k,v in pairs(UI.buttons) do
-        v:removeFromDraw()
-    end
-    if STATE == STATE_EDIT then
-        UI = GAME_UI
-        STATE = STATE_GAME
-    elseif STATE == STATE_GAME then
-        UI = EDIT_UI
-        STATE = STATE_EDIT
-    end
-    for k,v in pairs(UI.buttons) do
-        v:addToDrawT()
-    end
-end)
+
 
 
 resetButton = Button:new()
@@ -143,7 +133,8 @@ resetButton:setFunction(function ()
                 node.model = "3DObjects/cube2.obj"
                 node.drawType = 0
                 node:addToDraw()
-                node:setPosition(x * 13, 0, y * 13)
+                node:setPosition(x * 13, -10, y * 13)
+                node:setScale(1,0.5,1)
                 gridObj:insert(node, x, y)
         end
     end
@@ -188,7 +179,7 @@ towers = {}
 enemies = {}--in the world updating and walking towards waypoints
 nrOfEnemies = 0
 enemyQueue = {}--waiting to go in the world( in table enemies)
-enmiesInQueue = 0
+enemiesInQueue = 0
 queueTime = 1 
 waveNr = 1
 totalTime = 0
@@ -205,28 +196,30 @@ function nextWave()
             e.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
             enemyQueue[i] = e
         end
-        enmiesInQueue = waveNr * 5
+        enemiesInQueue = waveNr * 5
         waveNr = waveNr + 1
     end
 end
 function updateQueue(deltaTime)
-    if enmiesInQueue > 0 then
+    if enemiesInQueue > 0 then
         totalTime = totalTime + deltaTime
         if totalTime >= queueTime then
             totalTime = 0
-            local e = enemyQueue[enmiesInQueue]
+            local e = enemyQueue[enemiesInQueue]
             e.obj:addToDraw()
-            print(enmiesInQueue)
+            
             e.obj:setPosition(waypoints[1].x, waypoints[1].y, waypoints[1].z)
             nrOfEnemies = nrOfEnemies + 1
             enemies[nrOfEnemies] = e
-            enemyQueue[enmiesInQueue] = nil
-            enmiesInQueue = enmiesInQueue - 1
+            print("inserted")
+            enemyQueue[enemiesInQueue] = nil
+            enemiesInQueue = enemiesInQueue - 1
         end
     end
 end
 function updateEnemies(deltaTime)
     local nrOfNil = 0
+    
     for i=1,nrOfEnemies do
         if enemies[i] ~= nil then
             if enemies[i].check == enemies[i].endIndex  then
@@ -259,3 +252,37 @@ end)
 GAME_UI.buttons["startButton"] = startButton
 bulletHandler = BulletHandler:new()
 
+objButton:setFunction(function ()
+    for k,v in pairs(UI.buttons) do
+        v:removeFromDraw()
+    end
+    if STATE == STATE_EDIT then
+        UI = GAME_UI
+        STATE = STATE_GAME
+    elseif STATE == STATE_GAME then
+        UI = EDIT_UI
+        STATE = STATE_EDIT
+    end
+    for k,v in pairs(UI.buttons) do
+        v:addToDrawT()
+    end
+    for k,v in pairs(towers) do
+        v.obj:removeFromDraw()
+    end
+    for k,v in pairs(enemies) do
+        v.obj:removeFromDraw()
+    end
+    for k,v in pairs(bulletHandler.bullets) do
+        v.obj:removeFromDraw()
+    end
+    bulletHandler.bullets = {}
+    bulletHandler.nrOfBullets = 0
+    towers = {}
+    enemies = {}
+    enemyQueue = {}
+    nrOfEnemies = 0
+    enemiesInQueue = 0
+    queueTime = 1 
+    waveNr = 1
+    totalTime = 0
+end)

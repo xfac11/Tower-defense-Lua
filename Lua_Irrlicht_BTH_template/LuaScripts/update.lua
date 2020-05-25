@@ -148,6 +148,8 @@ function GameMode()
                 testTower.obj:addToDraw()
                 testTower.obj:setPosition(posX * 13, 0, posY * 13)
                 testTower.obj:setScale(0.4, 1.5, 0.4)
+                testTower.x = posX
+                testTower.y = posY
                 C_setTexture(testTower.obj.typePtr, 0, "3DObjects/buttonStart.tga")
                 table.insert(towers, testTower)
                 COINS = COINS - 10
@@ -159,14 +161,14 @@ function GameMode()
     end
     updateQueue(deltatime)
     updateEnemies(deltatime)
-    bulletHandler:updateBullets(deltatime)
     for k,v in pairs(enemies) do
         v:update(deltatime)
     end
     for k,v in pairs(towers) do
         v:update(deltatime)
     end
-    
+    bulletHandler:updateBullets(deltatime)
+
 end
 function Update()
     for k,v in pairs(UI.buttons) do
