@@ -20,7 +20,7 @@ function BulletHandler:fireBullet(enemyID, pos, dmg, speed)
     self.bullets[self.nrOfBullets].obj = Gameobject:new()
     self.bullets[self.nrOfBullets].obj:addToDraw()
     self.bullets[self.nrOfBullets]:setPosition(pos.x, pos.y, pos.z)
-    self.bullets[self.nrOfBullets]:setScale(0.1, 0.1, 0.1)
+    self.bullets[self.nrOfBullets]:setScale(0.3, 0.1, 0.3)
     C_setTexture(self.bullets[self.nrOfBullets].obj.typePtr, 0, "3DObjects/waypoint.tga")
 
 end

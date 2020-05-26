@@ -20,7 +20,7 @@ Game::Game()
 
 Game::~Game()
 {
-
+	
 }
 
 void Game::run()
@@ -47,7 +47,7 @@ int Game::C_addToDraw(lua_State* L)
 
 	int type = (int)lua_tonumber(L, -2);
 	lua_remove(L, -2);
-	if (type == 0)
+	if (type == DrawType::MESH)
 	{
 		//mesh
 
@@ -61,7 +61,7 @@ int Game::C_addToDraw(lua_State* L)
 		lua_pushlightuserdata(L, node);
 
 	}
-	else if (type == 1)
+	else if (type == DrawType::BUTTON)
 	{
 		//button
 
@@ -76,7 +76,7 @@ int Game::C_addToDraw(lua_State* L)
 		lua_pop(L, 1);
 		lua_pushlightuserdata(L, button);
 	}
-	else if (type == 2)
+	else if (type == DrawType::TEXT)
 	{
 		//text
 
@@ -85,17 +85,11 @@ int Game::C_addToDraw(lua_State* L)
 		float x1 = (float)lua_tonumber(L, -3);
 		float y1 = (float)lua_tonumber(L, -2);
 
-
-
-
 		const char* text = lua_tostring(L, -1);
 		const size_t cSize = strlen(text) + 1;
 		wchar_t* wc = new wchar_t[cSize];
 		size_t outSize;
 		mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
-
-
-
 
 		gui::IGUIStaticText* statText = guienv->addStaticText(wc, core::recti(x, y, x1, y1));
 		delete[] wc;
@@ -104,6 +98,35 @@ int Game::C_addToDraw(lua_State* L)
 		statText->setOverrideFont(font);
 		lua_pop(L, 5);
 		lua_pushlightuserdata(L, statText);
+	}
+	else if (type == DrawType::EDITBOX)
+	{
+		float x = (float)lua_tonumber(L, -5);
+		float y = (float)lua_tonumber(L, -4);
+		float x1 = (float)lua_tonumber(L, -3);
+		float y1 = (float)lua_tonumber(L, -2);
+
+		const char* text = lua_tostring(L, -1);
+		const size_t cSize = strlen(text) + 1;
+		wchar_t* wc = new wchar_t[cSize];
+		size_t outSize;
+		mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
+
+		gui::IGUIEditBox* editBox = guienv->addEditBox(wc, core::rect<s32>(x, y, x1, y1));
+		delete[] wc;
+		lua_pop(L, 5);
+		lua_pushlightuserdata(L, editBox);
+	}
+	else if (type == DrawType::IMAGE)
+	{
+		float x = (float)lua_tonumber(L, -3);
+		float y = (float)lua_tonumber(L, -2);
+
+		const char* texture = lua_tostring(L, -1);
+
+		gui::IGUIImage* image = guienv->addImage(driver->getTexture(texture),core::vector2di(x,y));
+		lua_pop(L, 3);
+		lua_pushlightuserdata(L, image);
 	}
 
 	return 1;
@@ -333,16 +356,17 @@ int Game::C_setTexture(lua_State* L)
 	int type = lua_tonumber(L, -2);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -3);
 
-	if (type == 0)
+	if (type == DrawType::MESH)
 	{
 		node->setMaterialTexture(0, driver->getTexture(texture));
 	}
-	else if (type == 1)
+	else if (type == DrawType::BUTTON)
 	{
 		gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -3);
 		if (button != nullptr)
 			button->setImage(driver->getTexture(texture));
 	}
+	else if(type == 3)
 	lua_pop(L, 3);
 	return 0;
 }
@@ -351,9 +375,9 @@ int Game::C_setUIPos(lua_State* L)
 	int x = (int)lua_tonumber(L, -2);
 	int y = (int)lua_tonumber(L, -1);
 
-	gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -3);
-	if (button)
-		button->setRelativePosition(core::vector2di(x, y));
+	gui::IGUIElement* uiElement = (gui::IGUIElement*)lua_touserdata(L, -3);
+	if (uiElement)
+		uiElement->setRelativePosition(core::vector2di(x, y));
 	lua_pop(L, 3);
 	return 0;
 }
@@ -378,12 +402,26 @@ int Game::C_setText(lua_State* L)
 	size_t outSize;
 	mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
 
-
-	gui::IGUIStaticText* node = (gui::IGUIStaticText*)lua_touserdata(L, -2);
+	gui::IGUIElement* node = (gui::IGUIElement*)lua_touserdata(L, -2);
 	if (node != nullptr)
 		node->setText(wc);
 	lua_pop(L, 2);
+	delete[] wc;
+
 	return 0;
+}
+int Game::C_getText(lua_State* L)
+{
+	gui::IGUIEditBox* editBox = (gui::IGUIEditBox*)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	if (editBox)
+	{
+		const WCHAR* wc = editBox->getText();
+		_bstr_t convert(wc);
+		const char* text = convert;
+		lua_pushstring(L, text);
+	}
+	return 1;
 }
 void Game::render()
 {
@@ -410,7 +448,12 @@ void Game::render()
 
 void Game::initialize()
 {
-	this->device = irr::createDevice(irr::video::EDT_OPENGL, irr::core::dimension2d<irr::u32>(1280, 720), 16, false, false, false, &eventRec);
+	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
+	params.AntiAlias = 4;
+	params.DriverType = video::EDT_OPENGL;
+	params.WindowSize = core::dimension2d<u32>(1280, 720);
+	params.EventReceiver = &eventRec;
+	this->device = irr::createDeviceEx(params);
 	this->driver = device->getVideoDriver();
 	this->smgr = device->getSceneManager();
 	this->guienv = device->getGUIEnvironment();
@@ -418,12 +461,11 @@ void Game::initialize()
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
 	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
-	smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 150, 0))->setRadius(200);
+	//smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 150, 0))->setRadius(100);
 	font = device->getGUIEnvironment()->getFont("myfont.xml");
 	
-	scene::IMesh* plane = geomentryCreator->createPlaneMesh(irr::core::dimension2d<irr::f32>(100, 100), irr::core::dimension2d<irr::u32>(100, 100));
-	plane->setMaterialFlag(video::EMF_LIGHTING, false);
-
+	guienv->addImage(driver->getTexture("3DObjects/cube2.tga"),
+		core::position2d<int>(10, 10));
 
 }
 
@@ -431,15 +473,6 @@ void Game::update()
 {
 	//Update
 	//call update script
-	if (this->eventRec.IsKeyDown(irr::KEY_KEY_V))
-	{
-		luaL_dofile(L, "Lua_Irrlicht_BTH_template/LuaScripts/test2.lua");
-		int error = luaL_loadfile(L, "Lua_Irrlicht_BTH_template/LuaScripts/test2.lua");
-		if (error)
-		{
-			std::cout << "error";
-		}
-	}
 	lua_getglobal(L, "Update");
 	if (lua_type(L, -1) == LUA_TFUNCTION)
 	{
@@ -488,11 +521,8 @@ void Game::initLua()
 	lua_setglobal(L, "C_setUIPos");
 	lua_pushcfunction(L, this->C_setTexture);
 	lua_setglobal(L, "C_setTexture");
-	int error = luaL_loadfile(L, "E:/Lua_Irrlicht_BTH_template/Lua_Irrlicht_BTH_template/LuaScripts/test2.lua");
-	if (error)
-	{
-		std::cout << "error";
-	}
+	lua_pushcfunction(L, this->C_getText);
+	lua_setglobal(L, "C_getText");
 
 	luaL_dofile(L, "LuaScripts/Init.lua");
 	luaL_dofile(L, "LuaScripts/update.lua");

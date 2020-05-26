@@ -13,6 +13,7 @@ void ConsoleThread(lua_State* L)
 
 int main()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	Game game;
 	/*
 	En bra tumregel får att separera logik från C++ är att tänka på att C++-delen ska kunna användas till olika typer av spel.

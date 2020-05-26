@@ -14,7 +14,7 @@ function Gameobject:new(c)
     setmetatable(c, self)
     c.position = Vector3:new(0, 0, 0)
     c.rotation = Vector3:new(0, 0, 0)
-    c.model = "3DObjects/cube2.obj"
+    c.model = "3DObjects/BetterCubeUV.obj"
     return c
 end
 

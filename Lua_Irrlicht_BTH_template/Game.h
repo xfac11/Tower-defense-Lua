@@ -14,7 +14,7 @@
 #include <vector>
 #include <string>
 #include <irrlicht.h>
-#include"Gameobject.h"
+#include <comdef.h>  
 using namespace irr;
 class MyEventReceiver : public irr::IEventReceiver
 {
@@ -104,11 +104,13 @@ struct Stage
 	int width;
 	int grid[1024]; // 32 x 32
 };
-struct LuaDraw
+enum DrawType
 {
-	std::vector<irr::scene::IMeshSceneNode*> sceneObjects;
-	std::vector<irr::gui::IGUIButton*> sceneButtons;
-	std::vector<irr::gui::IGUIStaticText*> sceneText;
+	MESH,
+	BUTTON,
+	TEXT,
+	EDITBOX,
+	IMAGE
 };
 class Game
 {
@@ -135,6 +137,7 @@ public:
 	static int C_isButtonPressed(lua_State* L);
 	static int C_getDeltaTime(lua_State* L);
 	static int C_setText(lua_State* L);
+	static int C_getText(lua_State* L);
 	lua_State* L;
 private:
 	static MyEventReceiver eventRec;

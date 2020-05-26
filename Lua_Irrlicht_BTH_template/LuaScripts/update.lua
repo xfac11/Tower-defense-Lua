@@ -3,7 +3,7 @@ function EditMode()
     -- body
     local deltatime = C_getDeltaTime()
 
-    local x, y, z = C_getMousePos3D(0, 1, 0)--parameter is a position where the plane is. can be one nodes pos
+    local x, y, z = C_getMousePos3D(0, -9, 0)--parameter is a position where the plane is. can be one nodes pos
         
     x = x - 7--offset from 0,0,0
     z = z - 7
@@ -21,41 +21,19 @@ function EditMode()
     posX = x--stores the cellindex
     posY = z
     if gridObj:isValid(posX, posY) then
-        selectObj:setPosition(posX * 13, 0, posY * 13)
+        selectObj:setPosition(posX * 13, -9, posY * 13)
     end
 
     if MODE_C and C_isKeyPressed(Key.MOUSE_RIGHT) and isPressed2 == false then
-       
-        local x, y, z = C_getMousePos3D(0, 1, 0)--parameter is a position where the plane is. can be one nodes pos
-        
-        x = x - 7--offset from 0,0,0
-        z = z - 7
-        
-        
-        x = x / 13--size per node in world space
-        z = z / 13
-    
-        x = x + 1--lua start at 1
-        z = z + 1
-        
-        x = math.floor( x )--removes the decimal  ex: 3.8 ==> 3
-        z = math.floor( z )
-    
-        posX = x--stores the cellindex
-        posY = z
-
-        --gridObj:cell(posX, posY):removeFromDraw()
-        
-        --nrOfWP = nrOfWP + 1
-        --waypoints[nrOfWP] = Vector3:new(posX * 13, 0, posY * 13)
         if grid:cell(posX, posY) ~= 1 then--There is not a cube here so put cube
             grid:insert(1, posX, posY)
             local node = Gameobject:new()
-            node.model = "3DObjects/cube2.obj"
+            node.model = "3DObjects/BetterCubeUV.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
                 gridObj:cell(posX, posY):addToDraw()
-                gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
+                gridObj:cell(posX, posY):setPosition(posX * 13, cubeBase, posY * 13)
+                gridObj:cell(posX, posY):setScale(cubeScale.x,cubeScale.y,cubeScale.z)
             end
         elseif grid:cell(posX, posY) ~= 0 then--there is a cube here so put none
             grid:insert(0, posX, posY)
@@ -80,12 +58,12 @@ function EditMode()
             waypoints[nrOfWP] = Vector3:new(posX * 13, 0, posY * 13)
             grid:insert(value, posX, posY)
             local node = Gameobject:new()
-            node.model = "3DObjects/cube2.obj"
+            node.model = "3DObjects/BetterCubeUV.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
                 gridObj:cell(posX, posY):addToDraw()
                 gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
-                gridObj:cell(posX, posY):setScale(0.2,0.2,0.2)
+                gridObj:cell(posX, posY):setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
                 C_setTexture(gridObj:cell(posX, posY).typePtr, 0, "3DObjects/waypoint.tga")
             end
         end       
@@ -100,7 +78,7 @@ function GameMode()
 
     local deltatime = C_getDeltaTime()
 
-    local x, y, z = C_getMousePos3D(0, 1, 0)--parameter is a position where the plane is. can be one nodes pos
+    local x, y, z = C_getMousePos3D(0, -9, 0)--parameter is a position where the plane is. can be one nodes pos
         
     x = x - 7--offset from 0,0,0
     z = z - 7
@@ -122,7 +100,7 @@ function GameMode()
     posX = x--stores the cellindex
     posY = z
     if gridObj:isValid(posX, posY) then
-        selectObj:setPosition(posX * 13, 0, posY * 13)
+        selectObj:setPosition(posX * 13, -9, posY * 13)
     end
     C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
 
@@ -137,11 +115,11 @@ function GameMode()
             end 
             if towerHere == false and COINS >= 10 then
                 local testTower = Tower:new()
-                testTower.model = "3DObjects/cube2.obj"
+                testTower.model = "3DObjects/BetterCubeUV.obj"
                 testTower.drawType = 0
                 testTower.obj:addToDraw()
-                testTower.obj:setPosition(posX * 13, 0, posY * 13)
-                testTower.obj:setScale(0.4, 1.5, 0.4)
+                testTower.obj:setPosition(posX * 13, -6, posY * 13)
+                testTower.obj:setScale(2, 1.5, 2)
                 testTower.x = posX
                 testTower.y = posY
                 C_setTexture(testTower.obj.typePtr, 0, "3DObjects/buttonStart.tga")
