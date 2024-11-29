@@ -1,6 +1,6 @@
 #include"Game.h"
 #define _IRR_COMPILE_WITH_BMP_LOADER_
-void ConsoleThread(lua_State* L)
+void static ConsoleThread(lua_State* L)
 {
 	char command[1000];
 	while (GetConsoleWindow()) {

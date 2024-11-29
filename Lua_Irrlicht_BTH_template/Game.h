@@ -91,17 +91,31 @@ private:
 	bool KeyIsDown[irr::KEY_KEY_CODES_COUNT];
 
 };
+class WideText
+{
+public:
+	WideText(const char* text)
+	{
+		const size_t cSize = strlen(text) + 1;
+		wchar = new wchar_t[cSize];
+		size_t outSize;
+		mbstowcs_s(&outSize, wchar, cSize, text, cSize - 1);
+	}
+	~WideText()
+	{
+		delete[] wchar;
+	}
+	wchar_t* getWideChar()
+	{
+		return wchar;
+	}
+private:
+	wchar_t* wchar;
+};
 struct Stage
 {
-	Stage()
-	{
-		for (int i = 0; i < 1024; i++)
-		{
-			grid[i] = 0;
-		}
-	}
-	int height;
-	int width;
+	uint32_t height;
+	uint32_t width;
 	int grid[1024]; // 32 x 32
 };
 enum DrawType
@@ -152,7 +166,7 @@ private:
 	static gui::IGUIFont* font;
 	void render();//C++
 	void initialize();
-	void update();//LUA
+	void update() const;//LUA
 	void initLua();
 
 };

@@ -80,19 +80,17 @@ int Game::C_addToDraw(lua_State* L)
 	{
 		//text
 
-		float x = (float)lua_tonumber(L, -5);
-		float y = (float)lua_tonumber(L, -4);
-		float x1 = (float)lua_tonumber(L, -3);
-		float y1 = (float)lua_tonumber(L, -2);
-
+		int x = (int)lua_tonumber(L, -5);
+		int y = (int)lua_tonumber(L, -4);
+		int x1 = (int)lua_tonumber(L, -3);
+		int y1 = (int)lua_tonumber(L, -2);
 		const char* text = lua_tostring(L, -1);
-		const size_t cSize = strlen(text) + 1;
-		wchar_t* wc = new wchar_t[cSize];
-		size_t outSize;
-		mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
 
-		gui::IGUIStaticText* statText = guienv->addStaticText(wc, core::recti(x, y, x1, y1));
-		delete[] wc;
+		WideText wText(text);
+
+		core::recti rectangle(x, y, x1, y1);
+
+		gui::IGUIStaticText* statText = guienv->addStaticText(wText.getWideChar(), rectangle);
 		statText->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
 		statText->setTextRestrainedInside(false);
 		statText->setOverrideFont(font);
@@ -101,30 +99,30 @@ int Game::C_addToDraw(lua_State* L)
 	}
 	else if (type == DrawType::EDITBOX)
 	{
-		float x = (float)lua_tonumber(L, -5);
-		float y = (float)lua_tonumber(L, -4);
-		float x1 = (float)lua_tonumber(L, -3);
-		float y1 = (float)lua_tonumber(L, -2);
-
+		int x = (int)lua_tonumber(L, -5);
+		int y = (int)lua_tonumber(L, -4);
+		int x1 = (int)lua_tonumber(L, -3);
+		int y1 = (int)lua_tonumber(L, -2);
 		const char* text = lua_tostring(L, -1);
-		const size_t cSize = strlen(text) + 1;
-		wchar_t* wc = new wchar_t[cSize];
-		size_t outSize;
-		mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
+		
+		WideText wideText(text);
 
-		gui::IGUIEditBox* editBox = guienv->addEditBox(wc, core::rect<s32>(x, y, x1, y1));
-		delete[] wc;
+		core::recti rectangle(x, y, x1, y1);
+
+		gui::IGUIEditBox* editBox = guienv->addEditBox(wideText.getWideChar(), rectangle);
 		lua_pop(L, 5);
 		lua_pushlightuserdata(L, editBox);
 	}
 	else if (type == DrawType::IMAGE)
 	{
-		float x = (float)lua_tonumber(L, -3);
-		float y = (float)lua_tonumber(L, -2);
+		int x = (int)lua_tonumber(L, -3);
+		int y = (int)lua_tonumber(L, -2);
 
 		const char* texture = lua_tostring(L, -1);
 
-		gui::IGUIImage* image = guienv->addImage(driver->getTexture(texture),core::vector2di(x,y));
+		core::vector2di position(x, y);
+
+		gui::IGUIImage* image = guienv->addImage(driver->getTexture(texture), position);
 		lua_pop(L, 3);
 		lua_pushlightuserdata(L, image);
 	}
@@ -136,32 +134,28 @@ int Game::C_removeFromDraw(lua_State* L)
 {
 	int type = (int)lua_tonumber(L, -2);
 	lua_remove(L, -2);
-	if (type == 0)
+	if (type == DrawType::MESH)
 	{
-		//mesh
-
 		scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -1);
 		lua_pop(L, 1);
 		if (node != nullptr)
 			node->remove();
 
 	}
-	else if (type == 1)
+	else if (type == DrawType::BUTTON)
 	{
-		//Button
 		gui::IGUIButton * button = (gui::IGUIButton*)lua_touserdata(L, -1);
 		lua_pop(L, 1);
 		if (button != nullptr)
 			button->remove();
 
 	}
-	else if (type == 2)
+	else if (type == DrawType::TEXT)
 	{
 		gui::IGUIStaticText * text = (gui::IGUIStaticText*)lua_touserdata(L, -1);
 		lua_pop(L, 1);
 		if (text != nullptr)
 			text->remove();
-		//text
 		
 	}
 	return 0;
@@ -184,6 +178,7 @@ int Game::C_loadStage(lua_State* L)
 	lua_pop(L, 1);
 	std::ifstream rf(fileName, std::ios::out | std::ios::binary);
 	Stage stage;
+	memset(&stage, 0, sizeof(Stage));
 	if (!rf)
 	{
 		return 0;
@@ -210,10 +205,11 @@ int Game::C_saveStage(lua_State* L)
 	std::string fileName = lua_tostring(L, -1);
 	lua_pop(L, 1);
 	std::ofstream wf(fileName, std::ios::out | std::ios::binary);
-	Stage stage;
+	Stage stage{};
+	memset(&stage, 0, sizeof(Stage));
 
-	stage.width = lua_tonumber(L, -1);
-	stage.height = lua_tonumber(L, -2);
+	stage.width = (int)lua_tonumber(L, -1);
+	stage.height = (int)lua_tonumber(L, -2);
 
 	lua_remove(L, -1);
 	lua_remove(L, -1);
@@ -279,13 +275,13 @@ int Game::C_addCube(lua_State* L)
 }
 int Game::C_isKeyPressed(lua_State* L)
 {
-	int key = lua_tonumber(L, -1);
+	int key = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
-	if (key == 1)
+	if (key == EKEY_CODE::KEY_LBUTTON)
 	{
 		lua_pushboolean(L, eventRec.getMouseState().leftButtonDown);
 	}
-	else if (key == 2)
+	else if (key == EKEY_CODE::KEY_RBUTTON)
 	{
 		lua_pushboolean(L, eventRec.getMouseState().rightButtonDown);
 	}
@@ -353,7 +349,7 @@ int Game::C_setCamTarget(lua_State* L)
 int Game::C_setTexture(lua_State* L)
 {
 	const char* texture = lua_tostring(L, -1);
-	int type = lua_tonumber(L, -2);
+	int type = (int)lua_tonumber(L, -2);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -3);
 
 	if (type == DrawType::MESH)
@@ -397,16 +393,12 @@ int Game::C_getDeltaTime(lua_State* L)
 int Game::C_setText(lua_State* L)
 {
 	const char* text = lua_tostring(L, -1);
-	const size_t cSize = strlen(text) + 1;
-	wchar_t* wc = new wchar_t[cSize];
-	size_t outSize;
-	mbstowcs_s(&outSize, wc, cSize, text, cSize - 1);
+	WideText wideText(text);
 
 	gui::IGUIElement* node = (gui::IGUIElement*)lua_touserdata(L, -2);
 	if (node != nullptr)
-		node->setText(wc);
+		node->setText(wideText.getWideChar());
 	lua_pop(L, 2);
-	delete[] wc;
 
 	return 0;
 }
@@ -427,18 +419,10 @@ void Game::render()
 {
 	if (device->isWindowActive())
 	{
-
-
 		driver->beginScene(true, true, irr::video::SColor(255, 0, 0, 200));
-
-
 		smgr->drawAll();
 		guienv->drawAll();
-
-
 		driver->endScene();
-
-
 	}
 	else
 	{
@@ -469,7 +453,7 @@ void Game::initialize()
 
 }
 
-void Game::update()
+void Game::update() const
 {
 	//Update
 	//call update script
