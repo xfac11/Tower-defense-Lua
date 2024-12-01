@@ -14,121 +14,27 @@
 #include <vector>
 #include <string>
 #include <irrlicht.h>
-#include <comdef.h>  
+#include <comdef.h>
+#include"MyEventReceiver.h"
+#include"WideText.h"
 using namespace irr;
-class MyEventReceiver : public irr::IEventReceiver
-{
-public:
-	struct SMouseState
-	{
-		core::position2di position;
-		bool leftButtonDown;
-		bool rightButtonDown;
-		SMouseState() : leftButtonDown(false), rightButtonDown(false)
-		{
-
-		}
-	} MouseState;
-
-	// This is the one method that we have to implement
-	virtual bool OnEvent(const irr::SEvent& event)
-	{
-		if (event.EventType == EET_MOUSE_INPUT_EVENT)
-		{
-			switch (event.MouseInput.Event)
-			{
-			case EMIE_LMOUSE_PRESSED_DOWN:
-				MouseState.leftButtonDown = true;
-				break;
-
-			case EMIE_LMOUSE_LEFT_UP:
-				MouseState.leftButtonDown = false;
-				break;
-
-			case EMIE_RMOUSE_PRESSED_DOWN:
-				MouseState.rightButtonDown = true;
-				break;
-
-			case EMIE_RMOUSE_LEFT_UP:
-				MouseState.rightButtonDown = false;
-				break;
-
-			case EMIE_MOUSE_MOVED:
-				MouseState.position.X = event.MouseInput.X;
-				MouseState.position.Y = event.MouseInput.Y;
-				break;
-
-			default:
-				break;
-			}
-		}
-		// Remember whether each key is down or up
-		if (event.EventType == irr::EET_KEY_INPUT_EVENT)
-			KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
-
-		return false;
-	}
-
-	const SMouseState& getMouseState() const
-	{
-		return MouseState;
-	}
-
-	// This is used to check whether a key is being held down
-	virtual bool IsKeyDown(irr::EKEY_CODE keyCode) const
-	{
-		return KeyIsDown[keyCode];
-	}
-
-	MyEventReceiver()
-	{
-		for (irr::u32 i = 0; i < irr::KEY_KEY_CODES_COUNT; ++i)
-			KeyIsDown[i] = false;
-	}
-
-private:
-	// We use this array to store the current state of each key
-	bool KeyIsDown[irr::KEY_KEY_CODES_COUNT];
-
-};
-class WideText
-{
-public:
-	WideText(const char* text)
-	{
-		const size_t cSize = strlen(text) + 1;
-		wchar = new wchar_t[cSize];
-		size_t outSize;
-		mbstowcs_s(&outSize, wchar, cSize, text, cSize - 1);
-	}
-	~WideText()
-	{
-		delete[] wchar;
-	}
-	wchar_t* getWideChar()
-	{
-		return wchar;
-	}
-private:
-	wchar_t* wchar;
-};
-struct Stage
-{
-	uint32_t height;
-	uint32_t width;
-	int grid[1024]; // 32 x 32
-};
-enum DrawType
-{
-	MESH,
-	BUTTON,
-	TEXT,
-	EDITBOX,
-	IMAGE
-};
 class Game
 {
 public:
+	struct Stage
+	{
+		uint32_t height;
+		uint32_t width;
+		int grid[1024]; // 32 x 32
+	};
+	enum DrawType
+	{
+		MESH,
+		BUTTON,
+		TEXT,
+		EDITBOX,
+		IMAGE
+	};
 	Game();
 	~Game();
 	void run();
