@@ -165,7 +165,7 @@ private:
 
 	static gui::IGUIFont* font;
 	void render();//C++
-	void initialize();
+	void initIrrlicht();
 	void update() const;//LUA
 	void initLua();
 

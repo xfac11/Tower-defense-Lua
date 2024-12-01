@@ -16,18 +16,91 @@ Game::Game()
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	this->eventRec = MyEventReceiver();
+	initIrrlicht();
+	initLua();
+	device->getCursorControl()->setVisible(true);
 }
 
 Game::~Game()
 {
+	device->drop();
+	lua_close(L);
+}
+
+void Game::initIrrlicht()
+{
+	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
+	params.AntiAlias = 4;
+	params.DriverType = video::EDT_OPENGL;
+	params.WindowSize = core::dimension2d<u32>(1280, 720);
+	params.EventReceiver = &eventRec;
+
+	this->device = irr::createDeviceEx(params);
+
+	this->driver = device->getVideoDriver();
+	this->smgr = device->getSceneManager();
+	this->guienv = device->getGUIEnvironment();
+	this->geomentryCreator = smgr->getGeometryCreator();
+
+
+	//Set default settings and a camera for irrlicht
+	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
 	
+	font = device->getGUIEnvironment()->getFont("myfont.xml");
+
+	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
+
+	guienv->addImage(driver->getTexture("3DObjects/cube2.tga"),
+		core::position2d<int>(10, 10));
+}
+
+void Game::initLua()
+{
+	lua_pushcfunction(L, this->C_loadStage);
+	lua_setglobal(L, "C_loadStage");
+	lua_pushcfunction(L, this->C_saveStage);
+	lua_setglobal(L, "C_saveStage");
+	lua_pushcfunction(L, this->C_addToDraw);
+	lua_setglobal(L, "C_addToDraw");
+	lua_pushcfunction(L, this->C_setVisible);
+	lua_setglobal(L, "C_setVisible");
+	lua_pushcfunction(L, this->C_setPosition);
+	lua_setglobal(L, "C_setPosition");
+	lua_pushcfunction(L, this->C_setScale);
+	lua_setglobal(L, "C_setScale");
+	lua_pushcfunction(L, this->C_isKeyPressed);
+	lua_setglobal(L, "C_isKeyPressed");
+	lua_pushcfunction(L, this->C_getMousePos3D);
+	lua_setglobal(L, "C_getMousePos3D");
+	lua_pushcfunction(L, this->C_setCamPos);
+	lua_setglobal(L, "C_setCamPos");
+	lua_pushcfunction(L, this->C_isButtonPressed);
+	lua_setglobal(L, "C_isButtonPressed");
+	lua_pushcfunction(L, this->C_getDeltaTime);
+	lua_setglobal(L, "C_getDeltaTime");
+	lua_pushcfunction(L, this->C_removeFromDraw);
+	lua_setglobal(L, "C_removeFromDraw");
+	lua_pushcfunction(L, this->C_setRotation);
+	lua_setglobal(L, "C_setRotation");
+	lua_pushcfunction(L, this->C_setText);
+	lua_setglobal(L, "C_setText");
+	lua_pushcfunction(L, this->C_setCamTarget);
+	lua_setglobal(L, "C_setCamTarget");
+	lua_pushcfunction(L, this->C_setUIPos);
+	lua_setglobal(L, "C_setUIPos");
+	lua_pushcfunction(L, this->C_setTexture);
+	lua_setglobal(L, "C_setTexture");
+	lua_pushcfunction(L, this->C_getText);
+	lua_setglobal(L, "C_getText");
+
+	luaL_dofile(L, "LuaScripts/Init.lua");
+	luaL_dofile(L, "LuaScripts/update.lua");
+
+
 }
 
 void Game::run()
 {
-	initialize();
-	initLua();
-	device->getCursorControl()->setVisible(true);
 	irr::u32 then = device->getTimer()->getTime();
 	while (device->run())
 	{
@@ -36,10 +109,7 @@ void Game::run()
 		then = now;
 		this->update();
 		this->render();
-
 	}
-	device->drop();
-	lua_close(L);
 }
 
 int Game::C_addToDraw(lua_State* L)
@@ -430,28 +500,7 @@ void Game::render()
 	}
 }
 
-void Game::initialize()
-{
-	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
-	params.AntiAlias = 4;
-	params.DriverType = video::EDT_OPENGL;
-	params.WindowSize = core::dimension2d<u32>(1280, 720);
-	params.EventReceiver = &eventRec;
-	this->device = irr::createDeviceEx(params);
-	this->driver = device->getVideoDriver();
-	this->smgr = device->getSceneManager();
-	this->guienv = device->getGUIEnvironment();
-	this->geomentryCreator = smgr->getGeometryCreator();
 
-	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
-	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
-	//smgr->addLightSceneNode((irr::scene::ISceneNode*)0, core::vector3df(100, 150, 0))->setRadius(100);
-	font = device->getGUIEnvironment()->getFont("myfont.xml");
-	
-	guienv->addImage(driver->getTexture("3DObjects/cube2.tga"),
-		core::position2d<int>(10, 10));
-
-}
 
 void Game::update() const
 {
@@ -467,49 +516,4 @@ void Game::update() const
 	{
 		luaL_error(L, "unknown script function %s", "Update");
 	}
-}
-
-void Game::initLua()
-{
-	lua_pushcfunction(L, this->C_loadStage);
-	lua_setglobal(L, "C_loadStage");
-	lua_pushcfunction(L, this->C_saveStage);
-	lua_setglobal(L, "C_saveStage");
-	lua_pushcfunction(L, this->C_addToDraw);
-	lua_setglobal(L, "C_addToDraw");
-	lua_pushcfunction(L, this->C_setVisible);
-	lua_setglobal(L, "C_setVisible");
-	lua_pushcfunction(L, this->C_setPosition);
-	lua_setglobal(L, "C_setPosition");
-	lua_pushcfunction(L, this->C_setScale);
-	lua_setglobal(L, "C_setScale");
-	lua_pushcfunction(L, this->C_isKeyPressed);
-	lua_setglobal(L, "C_isKeyPressed");
-	lua_pushcfunction(L, this->C_getMousePos3D);
-	lua_setglobal(L, "C_getMousePos3D");
-	lua_pushcfunction(L, this->C_setCamPos);
-	lua_setglobal(L, "C_setCamPos");
-	lua_pushcfunction(L, this->C_isButtonPressed);
-	lua_setglobal(L, "C_isButtonPressed");
-	lua_pushcfunction(L, this->C_getDeltaTime);
-	lua_setglobal(L, "C_getDeltaTime");
-	lua_pushcfunction(L, this->C_removeFromDraw);
-	lua_setglobal(L, "C_removeFromDraw");
-	lua_pushcfunction(L, this->C_setRotation);
-	lua_setglobal(L, "C_setRotation");
-	lua_pushcfunction(L, this->C_setText);
-	lua_setglobal(L, "C_setText");
-	lua_pushcfunction(L, this->C_setCamTarget);
-	lua_setglobal(L, "C_setCamTarget");
-	lua_pushcfunction(L, this->C_setUIPos);
-	lua_setglobal(L, "C_setUIPos");
-	lua_pushcfunction(L, this->C_setTexture);
-	lua_setglobal(L, "C_setTexture");
-	lua_pushcfunction(L, this->C_getText);
-	lua_setglobal(L, "C_getText");
-
-	luaL_dofile(L, "LuaScripts/Init.lua");
-	luaL_dofile(L, "LuaScripts/update.lua");
-
-
 }
