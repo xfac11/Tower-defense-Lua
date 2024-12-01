@@ -162,8 +162,17 @@ private:
 	static irr::scene::ICameraSceneNode* camera;
 	const static irr::scene::IGeometryCreator* geomentryCreator;
 	static float deltaTime;
-
 	static gui::IGUIFont* font;
+
+	const irr::video::SColor CLEARCOLOR = irr::video::SColor(255, 0, 0, 200);
+	const irr::u8 ANTIALIAS = 4;
+	const irr::video::E_DRIVER_TYPE DRIVERTYPE = irr::video::EDT_OPENGL;
+	const core::dimension2d<u32> WINDOWSIZE = core::dimension2d<u32>(1280, 720);
+	const irr::io::path CWD = irr::io::path("Lua_Irrlicht_BTH_template");
+	const irr::io::path DEFAULTFONT = irr::io::path("myfont.xml");
+	const core::vector3df DEFAULTCAMERALOOKAT = core::vector3df(0, 0, 0);
+	const core::vector3df DEFAULTCAMERAPOSITION = core::vector3df(0, 50, -1);
+
 	void render();//C++
 	void initIrrlicht();
 	void update() const;//LUA

@@ -30,9 +30,9 @@ Game::~Game()
 void Game::initIrrlicht()
 {
 	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
-	params.AntiAlias = 4;
-	params.DriverType = video::EDT_OPENGL;
-	params.WindowSize = core::dimension2d<u32>(1280, 720);
+	params.AntiAlias = ANTIALIAS;
+	params.DriverType = DRIVERTYPE;
+	params.WindowSize = WINDOWSIZE;
 	params.EventReceiver = &eventRec;
 
 	this->device = irr::createDeviceEx(params);
@@ -44,11 +44,11 @@ void Game::initIrrlicht()
 
 
 	//Set default settings and a camera for irrlicht
-	device->getFileSystem()->changeWorkingDirectoryTo("Lua_Irrlicht_BTH_template");
+	device->getFileSystem()->changeWorkingDirectoryTo(CWD);
 	
-	font = device->getGUIEnvironment()->getFont("myfont.xml");
+	font = device->getGUIEnvironment()->getFont(DEFAULTFONT);
 
-	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, core::vector3df(0, 50, -1), core::vector3df(0, 0, 0));
+	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, DEFAULTCAMERAPOSITION, DEFAULTCAMERALOOKAT);
 
 	guienv->addImage(driver->getTexture("3DObjects/cube2.tga"),
 		core::position2d<int>(10, 10));
@@ -489,7 +489,7 @@ void Game::render()
 {
 	if (device->isWindowActive())
 	{
-		driver->beginScene(true, true, irr::video::SColor(255, 0, 0, 200));
+		driver->beginScene(true, true, CLEARCOLOR);
 		smgr->drawAll();
 		guienv->drawAll();
 		driver->endScene();
