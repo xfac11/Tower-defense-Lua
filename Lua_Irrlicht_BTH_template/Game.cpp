@@ -94,9 +94,9 @@ void Game::initLua()
 	lua_setglobal(L, "C_getText");
 
 	luaL_dofile(L, "LuaScripts/Init.lua");
+	//Load and call update.lua script to push the global Update function in the lua script.
+	//This Lua global Update function is then called in Game::update()
 	luaL_dofile(L, "LuaScripts/update.lua");
-
-
 }
 
 void Game::run()
@@ -517,3 +517,5 @@ void Game::update() const
 		luaL_error(L, "unknown script function %s", "Update");
 	}
 }
+
+
