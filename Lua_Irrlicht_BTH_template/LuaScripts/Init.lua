@@ -23,6 +23,7 @@ UI = {buttons = {}, text = {}}
 GAME_UI = {buttons = {}, text = {}}
 EDIT_UI = {buttons = {}, text = {}}
 MODETEXT = C_addToDraw(1200, 600, 1300, 700, DrawType.TEXT, "")
+C_setFont(MODETEXT, DrawType.TEXT, "myfont.xml")
 textBox = C_addToDraw(1000, 600, 1300, 700, DrawType.EDITBOX, "")
 PLAYER_HP = 100
 function loadGrid(fileName)
@@ -117,18 +118,22 @@ C_setCamTarget(6*13,0,6*13)
 C_setCamPos(150, 80, 6*13)
 --UI
 
+panelPtr = nil
+panelPtr = C_addToDraw(10, 10 ,DrawType.IMAGE, "3DObjects/cube2.tga")
+--C_setUIPos(panel, 10, 10)
+
+
 changeEM = Button:new()
 changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
 changeEM:setPosition(0,400)
 changeEM:setFunction(function ()
-if MODE_WP then
-    MODE_WP = false
-    MODE_C = true
-elseif MODE_C then
-    MODE_C = false
-    MODE_WP = true
-end
-
+    if MODE_WP then
+        MODE_WP = false
+        MODE_C = true
+    elseif MODE_C then
+        MODE_C = false
+        MODE_WP = true
+    end
 end)
 
 
@@ -213,7 +218,7 @@ C_setText(coinsText,"$"..tostring(COINS))
 isPressed = false
 isPressed2 = false
 
-hpText = C_addToDraw(120,160,160,200,2,"HP:")
+hpText = C_addToDraw(120,160,160,200,DrawType.TEXT,"HP:")
 C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
 
 --Game

@@ -58,6 +58,7 @@ public:
 	static int C_getDeltaTime(lua_State* L);
 	static int C_setText(lua_State* L);
 	static int C_getText(lua_State* L);
+	static int C_setFont(lua_State* L);
 	lua_State* L;
 private:
 	static MyEventReceiver eventRec;
