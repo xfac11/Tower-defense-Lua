@@ -23,6 +23,7 @@ UI = {buttons = {}, text = {}}
 GAME_UI = {buttons = {}, text = {}}
 EDIT_UI = {buttons = {}, text = {}}
 MODETEXT = C_addToDraw(1200, 600, 1300, 700, DrawType.TEXT, "")
+C_setFont(MODETEXT, DrawType.TEXT, "myfont.xml")
 textBox = C_addToDraw(1000, 600, 1300, 700, DrawType.EDITBOX, "")
 PLAYER_HP = 100
 function loadGrid(fileName)
@@ -217,7 +218,7 @@ C_setText(coinsText,"$"..tostring(COINS))
 isPressed = false
 isPressed2 = false
 
-hpText = C_addToDraw(120,160,160,200,2,"HP:")
+hpText = C_addToDraw(120,160,160,200,DrawType.TEXT,"HP:")
 C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
 
 --Game

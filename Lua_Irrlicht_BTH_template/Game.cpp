@@ -89,6 +89,8 @@ void Game::initLua()
 	lua_setglobal(L, "C_setTexture");
 	lua_pushcfunction(L, this->C_getText);
 	lua_setglobal(L, "C_getText");
+	lua_pushcfunction(L, this->C_setFont);
+	lua_setglobal(L, "C_setFont");
 
 	luaL_dofile(L, "LuaScripts/Init.lua");
 	//Load and call update.lua script to push the global Update function in the lua script.
@@ -117,7 +119,11 @@ int Game::C_addToDraw(lua_State* L)
 	if (type == DrawType::MESH)
 	{
 		//mesh
-
+		int top = lua_gettop(L);
+		if (top != 1)
+		{
+			std::cerr << "Error, not enought parameters were passed\n";
+		}
 		const char* model = lua_tostring(L, -1);
 		lua_pop(L, 1);
 		irr::scene::IMesh* mesh = smgr->getMesh(model);//change to model
@@ -131,6 +137,11 @@ int Game::C_addToDraw(lua_State* L)
 	else if (type == DrawType::BUTTON)
 	{
 		//button
+		int top = lua_gettop(L);
+		if (top != 1)
+		{
+			std::cerr << "Error, not enought parameters were passed\n";
+		}
 
 		const char* texture = lua_tostring(L, -1);
 
@@ -146,6 +157,12 @@ int Game::C_addToDraw(lua_State* L)
 	else if (type == DrawType::TEXT)
 	{
 		//text
+
+		int top = lua_gettop(L);
+		if (top != 5)
+		{
+			std::cerr << "Error, not enought parameters were passed\n";
+		}
 
 		int x = (int)lua_tonumber(L, -5);
 		int y = (int)lua_tonumber(L, -4);
@@ -166,6 +183,11 @@ int Game::C_addToDraw(lua_State* L)
 	}
 	else if (type == DrawType::EDITBOX)
 	{
+		int top = lua_gettop(L);
+		if (top != 5)
+		{
+			std::cerr << "Error, not enought parameters were passed\n";
+		}
 		int x = (int)lua_tonumber(L, -5);
 		int y = (int)lua_tonumber(L, -4);
 		int x1 = (int)lua_tonumber(L, -3);
@@ -182,6 +204,12 @@ int Game::C_addToDraw(lua_State* L)
 	}
 	else if (type == DrawType::IMAGE)
 	{
+		int top = lua_gettop(L);
+		if (top != 3)
+		{
+			std::cerr << "Error, not enought parameters were passed\n";
+		}
+
 		int x = (int)lua_tonumber(L, -3);
 		int y = (int)lua_tonumber(L, -2);
 
@@ -492,6 +520,50 @@ int Game::C_getText(lua_State* L)
 		lua_pushstring(L, text);
 	}
 	return 1;
+}
+int Game::C_setFont(lua_State* L)
+{
+	if (lua_gettop(L) != 3)
+	{
+		std::cerr << "Not enought parameters for C_setFont\n" << lua_gettop(L) << " passed\n";
+		return -1;
+	}
+	int type = (int)lua_tonumber(L, -2);
+	lua_remove(L, -2);
+	if (type == DrawType::BUTTON)
+	{
+		gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -2);
+		const char* fontPath = lua_tostring(L, -1);
+		if (button != nullptr)
+		{
+			const irr::io::path irrPath(fontPath);
+			irr::gui::IGUIFont* irrFont = guienv->getFont(irrPath);
+			if (irrFont == nullptr)
+			{
+				std::cerr << "Couldn't load the font: " << irrPath.c_str() << "\n";
+			}
+			button->setOverrideFont(irrFont);
+		}
+		lua_pop(L, 2);
+	}
+	else if (type == DrawType::TEXT)
+	{
+		gui::IGUIStaticText* text = (gui::IGUIStaticText*)lua_touserdata(L, -2);
+		const char* fontPath = lua_tostring(L, -1);
+		if (text != nullptr)
+		{
+			const irr::io::path irrPath(fontPath);
+			irr::gui::IGUIFont* irrFont = guienv->getFont(irrPath);
+			if (irrFont == nullptr)
+			{
+				std::cerr << "Couldn't load the font: " << irrPath.c_str() << "\n";
+			}
+			text->setOverrideFont(irrFont);
+		}
+		lua_pop(L, 2);
+	}
+
+	return 0;
 }
 void Game::render()
 {
