@@ -49,9 +49,6 @@ void Game::initIrrlicht()
 	font = device->getGUIEnvironment()->getFont(DEFAULTFONT);
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, DEFAULTCAMERAPOSITION, DEFAULTCAMERALOOKAT);
-
-	guienv->addImage(driver->getTexture("3DObjects/cube2.tga"),
-		core::position2d<int>(10, 10));
 }
 
 void Game::initLua()
@@ -192,7 +189,18 @@ int Game::C_addToDraw(lua_State* L)
 
 		core::vector2di position(x, y);
 
-		gui::IGUIImage* image = guienv->addImage(driver->getTexture(texture), position);
+		gui::IGUIImage* image = nullptr;
+		irr::video::ITexture* irrTexture = nullptr;
+		irrTexture = driver->getTexture(texture);
+		if (irrTexture == nullptr)
+		{
+			std::cerr << " Error loading texture \n";
+		}
+		image = guienv->addImage(irrTexture, position);
+		if (image == nullptr)
+		{
+			std::cerr << " Error adding image \n";
+		}
 		lua_pop(L, 3);
 		lua_pushlightuserdata(L, image);
 	}

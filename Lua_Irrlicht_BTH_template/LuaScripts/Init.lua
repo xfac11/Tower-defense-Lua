@@ -117,18 +117,22 @@ C_setCamTarget(6*13,0,6*13)
 C_setCamPos(150, 80, 6*13)
 --UI
 
+panelPtr = nil
+panelPtr = C_addToDraw(10, 10 ,DrawType.IMAGE, "3DObjects/cube2.tga")
+--C_setUIPos(panel, 10, 10)
+
+
 changeEM = Button:new()
 changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
 changeEM:setPosition(0,400)
 changeEM:setFunction(function ()
-if MODE_WP then
-    MODE_WP = false
-    MODE_C = true
-elseif MODE_C then
-    MODE_C = false
-    MODE_WP = true
-end
-
+    if MODE_WP then
+        MODE_WP = false
+        MODE_C = true
+    elseif MODE_C then
+        MODE_C = false
+        MODE_WP = true
+    end
 end)
 
 
