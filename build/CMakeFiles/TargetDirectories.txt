@@ -1,3 +1,0 @@
-D:/GitProjekt/Tower-defense-Lua/build/CMakeFiles/TowerDefense.dir
-D:/GitProjekt/Tower-defense-Lua/build/CMakeFiles/ALL_BUILD.dir
-D:/GitProjekt/Tower-defense-Lua/build/CMakeFiles/ZERO_CHECK.dir
