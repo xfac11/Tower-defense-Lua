@@ -43,12 +43,13 @@ add_custom_command(TARGET TowerDefense POST_BUILD        # Adds a post-build eve
         "${PROJECT_SOURCE_DIR}/libs/irrlicht-1.8.5/bin/Win64-VisualStudio/Irrlicht.dll"      # <--this is in-file
         $<TARGET_FILE_DIR:TowerDefense>)                 # <--this is out-file path
 
-
+# Copy the assets to the build directory
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
 )
 add_dependencies(TowerDefense copy_assets)
 
+#Copy the lua scripts to the build directory
 add_custom_target(copy_scripts
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-scripts.cmake
 )
