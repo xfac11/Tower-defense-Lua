@@ -1,6 +1,0 @@
-{
-    "Lua.diagnostics.globals": [
-        "C_setPosition",
-        "C_addToDraw"
-    ]
-}
