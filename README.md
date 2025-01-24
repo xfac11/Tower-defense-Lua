@@ -2,7 +2,8 @@ Tower defense game made in C++ using Irrlicht 1.8.5 with Lua scripting.
 
 The game is entirely made up with lua scripts and the C++ side is only used to expose functions to lua side. 
 
-##Build 
+##Build
+
 Build it with CMake.
 1. Change the current directory to build: cd build
 2. run cmake: "cmake .."
