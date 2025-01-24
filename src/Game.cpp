@@ -13,6 +13,7 @@ irr::gui::IGUIFont* Game::font = nullptr;
 
 Game::Game()
 {
+	HRESULT result = CoInitialize(nullptr);
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	this->eventRec = MyEventReceiver();
@@ -23,6 +24,7 @@ Game::Game()
 
 Game::~Game()
 {
+	CoUninitialize();
 	device->drop();
 	lua_close(L);
 }
@@ -44,7 +46,10 @@ void Game::initIrrlicht()
 
 
 	//Set default settings and a camera for irrlicht
-	device->getFileSystem()->changeWorkingDirectoryTo(CWD);
+	if (device->getFileSystem()->changeWorkingDirectoryTo(CWD))
+	{
+		std::cout << "Successfully changed the working directory to:" << device->getFileSystem()->getWorkingDirectory().c_str() << "\n";
+	}
 	
 	font = device->getGUIEnvironment()->getFont(DEFAULTFONT);
 
@@ -91,6 +96,8 @@ void Game::initLua()
 	lua_setglobal(L, "C_getText");
 	lua_pushcfunction(L, this->C_setFont);
 	lua_setglobal(L, "C_setFont");
+	lua_pushcfunction(L, this->C_print);
+	lua_setglobal(L, "C_print");
 
 	luaL_dofile(L, "LuaScripts/Init.lua");
 	//Load and call update.lua script to push the global Update function in the lua script.
@@ -129,7 +136,16 @@ int Game::C_addToDraw(lua_State* L)
 		irr::scene::IMesh* mesh = smgr->getMesh(model);//change to model
 
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
-		node->setMaterialTexture(0, driver->getTexture("3DObjects/cube2.tga"));
+		irr::video::ITexture *texture = driver->getTexture("Assets/3DObjects/cube2.tga");
+		if(texture == nullptr)
+		{
+			std::cout << "Could not load texture " << "Assets/3DObjects/cube2.tga\n";
+		}
+		else
+		{
+			std::cout << "Successfully loaded texture " << "Assets/3DObjects/cube2.tga\n";
+		}
+		node->setMaterialTexture(0, texture);
 		node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 		lua_pushlightuserdata(L, node);
 
@@ -563,6 +579,13 @@ int Game::C_setFont(lua_State* L)
 		lua_pop(L, 2);
 	}
 
+	return 0;
+}
+int Game::C_print(lua_State* L)
+{
+	const char* text = lua_tostring(L, -1);
+	std::cout << text << "\n";
+	lua_pop(L, 1);
 	return 0;
 }
 void Game::render()

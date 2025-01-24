@@ -23,7 +23,8 @@ UI = {buttons = {}, text = {}}
 GAME_UI = {buttons = {}, text = {}}
 EDIT_UI = {buttons = {}, text = {}}
 MODETEXT = C_addToDraw(1200, 600, 1300, 700, DrawType.TEXT, "")
-C_setFont(MODETEXT, DrawType.TEXT, "myfont.xml")
+C_setFont(MODETEXT, DrawType.TEXT, "Assets/Fonts/myfont.xml")
+C_print("Running init lua script 28")
 textBox = C_addToDraw(1000, 600, 1300, 700, DrawType.EDITBOX, "")
 PLAYER_HP = 100
 function loadGrid(fileName)
@@ -57,28 +58,30 @@ wayPointScale = Vector3:new(1,1,1)
 posX = -1
 posY = -1
 gridObj = Grid:new()
-grid = loadGrid("Stages/stage1.lvl")
+grid = loadGrid("Assets/Stages/stage1.lvl")
 gridObj:create(grid.width, grid.height)
 
 nrOfWP = 0 
 waypoints = {}
 
 selectObj = Gameobject:new()
-selectObj.model = "3DObjects/BetterCubeUV.obj"
+selectObj.model = "Assets/3DObjects/BetterCubeUV.obj"
 selectObj.drawType = 0
 selectObj:addToDraw()
 selectObj:setScale(5, 0.2, 5)
-C_setTexture(selectObj.typePtr, 0, "3DObjects/cube2Select.tga")
+C_setTexture(selectObj.typePtr, 0, "Assets/3DObjects/cube2Select.tga")
 
 
 --Setup objects in world for editor or game
 function loadInObjects()
+    C_print("Load in objects...")
     for x=1,grid.width do
         for y=1,grid.height do
             if grid:cell(x, y) == 1 then--place cube
                 local node = Gameobject:new()
-                node.model = "3DObjects/BetterCubeUV.obj"
+                node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
+                C_print("Added objects in world")
                 node:addToDraw()
                 node:setPosition(x * 13, cubeBase, y * 13)
                 node:setScale(cubeScale.x,cubeScale.y,cubeScale.z)
@@ -89,12 +92,12 @@ function loadInObjects()
                 waypoints[index] = Vector3:new(x * 13, -5, y * 13)
                 nrOfWP = nrOfWP + 1
                 local node = Gameobject:new()
-                node.model = "3DObjects/BetterCubeUV.obj"
+                node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
                 node:addToDraw()
                 node:setPosition(x * 13, -5, y * 13)
                 node:setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
-                C_setTexture(node.typePtr, 0, "3DObjects/waypoint.tga")
+                C_setTexture(node.typePtr, 0, "Assets/3DObjects/waypoint.tga")
                 
                 gridObj:insert(node, x, y)
             end
@@ -119,12 +122,12 @@ C_setCamPos(150, 80, 6*13)
 --UI
 
 panelPtr = nil
-panelPtr = C_addToDraw(10, 10 ,DrawType.IMAGE, "3DObjects/cube2.tga")
+panelPtr = C_addToDraw(10, 10 ,DrawType.IMAGE, "Assets/3DObjects/cube2.tga")
 --C_setUIPos(panel, 10, 10)
 
 
 changeEM = Button:new()
-changeEM:addToDraw("3DObjects/buttonWaypoint.tga")
+changeEM:addToDraw("Assets/3DObjects/buttonWaypoint.tga")
 changeEM:setPosition(0,400)
 changeEM:setFunction(function ()
     if MODE_WP then
@@ -138,13 +141,13 @@ end)
 
 
 objButton = Button:new()
-objButton:addToDraw("3DObjects/buttonMode.tga")
+objButton:addToDraw("Assets/3DObjects/buttonMode.tga")
 objButton:setPosition(1080,0)
 
 
 
 resetButton = Button:new()
-resetButton:addToDraw("3DObjects/buttonReset.tga")
+resetButton:addToDraw("Assets/3DObjects/buttonReset.tga")
 resetButton:setPosition(0,600)
 resetButton:setFunction(function ()
     for x=1,grid.width do
@@ -154,7 +157,7 @@ resetButton:setFunction(function ()
             end
             grid:insert(1, x, y)
             local node = Gameobject:new()
-                node.model = "3DObjects/BetterCubeUV.obj"
+                node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
                 node:addToDraw()
                 node:setPosition(x * 13, cubeBase, y * 13)
@@ -167,19 +170,19 @@ resetButton:setFunction(function ()
 end)
 
 saveButton = Button:new()
-saveButton:addToDraw("3DObjects/buttonSave.tga")
+saveButton:addToDraw("Assets/3DObjects/buttonSave.tga")
 saveButton:setPosition(0,0)
 saveButton:setFunction(function ()
     local text = C_getText(textBox)
     if text ~= "" then
         text = text .. ".lvl"
-        saveGrid(grid, grid.height, grid.width, "Stages/"..text)
+        saveGrid(grid, grid.height, grid.width, "Assets/Stages/"..text)
         C_setText(textBox,"")
     end
 end)
 
 loadButton = Button:new()
-loadButton:addToDraw("3DObjects/buttonLoad.tga")
+loadButton:addToDraw("Assets/3DObjects/buttonLoad.tga")
 loadButton:setPosition(0,100)
 loadButton:setFunction(function ()
     print("load")
@@ -187,7 +190,7 @@ loadButton:setFunction(function ()
     if text ~= "" then
         text = text .. ".lvl"
         removeGridObjects()
-        grid = loadGrid("Stages/"..text)
+        grid = loadGrid("Assets/Stages/"..text)
         gridObj = Grid:new()
         gridObj:create(grid.width, grid.height)
         loadInObjects()
@@ -231,19 +234,19 @@ queueTime = 1
 waveNr = 1
 totalTime = 0
 ground = Gameobject:new()
-ground.model = "3DObjects/BetterCubeUV.obj"
+ground.model = "Assets/3DObjects/BetterCubeUV.obj"
 ground.drawType = 0
 ground:addToDraw()
 ground:setPosition(5.5*13,-50, 5.5*13)
 ground:setScale(200,0.1,200)
-C_setTexture(ground.typePtr, 0, "3DObjects/ground.tga")
+C_setTexture(ground.typePtr, 0, "Assets/3DObjects/ground.tga")
 
 function nextWave()
     --Start the next wave
     if nrOfEnemies == 0 then     
         for i=1,waveNr*5 do
             local e = Enemy:new()
-            e.obj.model = "3DObjects/robot.obj"
+            e.obj.model = "Assets/3DObjects/robot.obj"
             e.obj.drawType = 0
             e.waypoints = waypoints
             e.endIndex = nrOfWP
@@ -294,7 +297,7 @@ function updateEnemies(deltaTime)
     end
 end
 startButton = Button:new()
-startButton.texture = "3DObjects/buttonStart.tga"
+startButton.texture = "Assets/3DObjects/buttonStart.tga"
 startButton:setPosition(0,0)
 startButton:setFunction(function ()
     --Start next wave

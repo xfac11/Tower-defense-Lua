@@ -4,7 +4,6 @@ function EditMode()
     local deltatime = C_getDeltaTime()
 
     local x, y, z = C_getMousePos3D(0, -9, 0)--parameter is a position where the plane is. can be one nodes pos
-        
     x = x - 7--offset from 0,0,0
     z = z - 7
     
@@ -28,7 +27,7 @@ function EditMode()
         if grid:cell(posX, posY) ~= 1 then--There is not a cube here so put cube
             grid:insert(1, posX, posY)
             local node = Gameobject:new()
-            node.model = "3DObjects/BetterCubeUV.obj"
+            node.model = "Assets/3DObjects/BetterCubeUV.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
                 gridObj:cell(posX, posY):addToDraw()
@@ -58,13 +57,13 @@ function EditMode()
             waypoints[nrOfWP] = Vector3:new(posX * 13, 0, posY * 13)
             grid:insert(value, posX, posY)
             local node = Gameobject:new()
-            node.model = "3DObjects/BetterCubeUV.obj"
+            node.model = "Assets/3DObjects/BetterCubeUV.obj"
             node.drawType = 0
             if gridObj:insert(node, posX, posY) then 
                 gridObj:cell(posX, posY):addToDraw()
                 gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
                 gridObj:cell(posX, posY):setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
-                C_setTexture(gridObj:cell(posX, posY).typePtr, 0, "3DObjects/waypoint.tga")
+                C_setTexture(gridObj:cell(posX, posY).typePtr, 0, "Assets/3DObjects/waypoint.tga")
             end
         end       
         isPressed = true
@@ -79,7 +78,7 @@ function GameMode()
     local deltatime = C_getDeltaTime()
 
     local x, y, z = C_getMousePos3D(0, -9, 0)--parameter is a position where the plane is. can be one nodes pos
-        
+    C_print(x)
     x = x - 7--offset from 0,0,0
     z = z - 7
     
@@ -115,14 +114,14 @@ function GameMode()
             end 
             if towerHere == false and COINS >= 10 then
                 local testTower = Tower:new()
-                testTower.model = "3DObjects/BetterCubeUV.obj"
+                testTower.model = "Assets/3DObjects/BetterCubeUV.obj"
                 testTower.drawType = 0
                 testTower.obj:addToDraw()
                 testTower.obj:setPosition(posX * 13, -6, posY * 13)
                 testTower.obj:setScale(2, 1.5, 2)
                 testTower.x = posX
                 testTower.y = posY
-                C_setTexture(testTower.obj.typePtr, 0, "3DObjects/buttonStart.tga")
+                C_setTexture(testTower.obj.typePtr, 0, "Assets/3DObjects/buttonStart.tga")
                 table.insert(towers, testTower)
                 COINS = COINS - 10
             end
