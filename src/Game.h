@@ -1,12 +1,14 @@
 #pragma once
 #include <fstream>
 #include <lua.hpp>
+#include <Windows.h>
 #include <iostream>
 #include <thread>
 #include "lua.hpp"
 #include <vector>
 #include <string>
 #include <irrlicht.h>
+#include <comdef.h>
 #include"MyEventReceiver.h"
 #include"WideText.h"
 using namespace irr;
