@@ -7,7 +7,6 @@
 #include <vector>
 #include <string>
 #include <irrlicht.h>
-#include <comdef.h>
 #include"MyEventReceiver.h"
 #include"WideText.h"
 using namespace irr;
