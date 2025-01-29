@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include <lua.hpp>
-#include <Windows.h>
 #include <iostream>
 #include <thread>
 #include "lua.hpp"
