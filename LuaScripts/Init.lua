@@ -126,19 +126,21 @@ panelPtr = C_addToDraw(10, 10 ,DrawType.IMAGE, "Assets/3DObjects/cube2.tga")
 --C_setUIPos(panel, 10, 10)
 
 
-changeEM = Button:new()
-changeEM:addToDraw("Assets/3DObjects/buttonWaypoint.tga")
-changeEM:setPosition(0,400)
-changeEM:setFunction(function ()
-    if MODE_WP then
-        MODE_WP = false
-        MODE_C = true
-    elseif MODE_C then
-        MODE_C = false
-        MODE_WP = true
-    end
+ToggleWaypointBtn = Button:new()
+ToggleWaypointBtn:addToDraw("Assets/Textures/DeSelectWaypoint.png")
+ToggleWaypointBtn:setPosition(0, 400)
+ToggleWaypointBtn:setFunction(function ()
+    MODE_WP = true
+    MODE_C = false
 end)
 
+ToggleBlockBtn = Button:new()
+ToggleBlockBtn:addToDraw("Assets/Textures/SelectBlock.png")
+ToggleBlockBtn:setPosition(50, 400)
+ToggleBlockBtn:setFunction(function ()
+    MODE_WP = false
+    MODE_C = true
+end)
 
 objButton = Button:new()
 objButton:addToDraw("Assets/3DObjects/buttonMode.tga")
@@ -200,13 +202,15 @@ end)
 
 
 UI.buttons["objButton"] = objButton
-UI.buttons["ChangeMode"] = changeEM
+UI.buttons["ToggleWaypoint"] = ToggleWaypointBtn
+UI.buttons["ToggleBlock"] = ToggleBlockBtn
 UI.buttons["resetButton"] = resetButton
 UI.buttons["saveButton"] = saveButton
 UI.buttons["loadButton"] = loadButton
 
 
-EDIT_UI.buttons["ChangeMode"] = changeEM
+EDIT_UI.buttons["ToggleWaypoint"] = ToggleWaypointBtn
+EDIT_UI.buttons["ToggleBlock"] = ToggleBlockBtn
 EDIT_UI.buttons["resetButton"] = resetButton
 EDIT_UI.buttons["saveButton"] = saveButton
 EDIT_UI.buttons["loadButton"] = loadButton

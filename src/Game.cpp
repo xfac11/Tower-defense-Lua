@@ -162,7 +162,7 @@ int Game::C_addToDraw(lua_State* L)
 		const char* texture = lua_tostring(L, -1);
 
 
-		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 100, 100));
+		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 50, 50));
 		button->setImage(driver->getTexture(texture));
 		//button->setScaleImage(true);
 		button->setOverrideFont(font);
