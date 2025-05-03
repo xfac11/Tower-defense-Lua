@@ -24,6 +24,7 @@ function EditMode()
     end
 
     if C_isKeyPressed(Key.MOUSE_LEFT) and isPressed == false then
+        C_print("Adding cube or waypoint")
         if MODE_C then
             AddCube(posX, posY)
         elseif MODE_WP then
@@ -34,6 +35,14 @@ function EditMode()
         isPressed = false
     end
 
+
+    if C_isKeyPressed(Key.MOUSE_RIGHT) and isPressed2 == false then
+        C_print("Removing waypoint")
+        RemoveLastPlacedWaypoint()
+        isPressed2 = true
+    elseif isPressed2 and C_isKeyPressed(Key.MOUSE_RIGHT) == false then
+        isPressed2 = false
+    end
 
 end
 
@@ -157,7 +166,17 @@ function AddWaypoint(x, y)
 end
 
 function RemoveLastPlacedWaypoint()
-    waypoints.remove(nrOfWP)
+    C_print("start removing waypoint")
+    local x = waypoints[nrOfWP].x / 13
+    local y = waypoints[nrOfWP].z / 13
+    C_print("calculated x and y")
+    table.remove(waypoints, nrOfWP)
     nrOfWP = nrOfWP - 1
-    
+
+    C_print("Removed waypoint from waypoint table")
+    grid:insert(0, x, y)
+    C_print("Removed waypoint from grid")
+    gridObj:cell(x, y):removeFromDraw()
+    gridObj:insert(nil, x, y)
+    C_print("Removed waypoint from gridObj")
 end
