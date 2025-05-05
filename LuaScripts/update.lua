@@ -36,11 +36,12 @@ function EditMode()
     end
 
 
-    if C_isKeyPressed(Key.MOUSE_RIGHT) and isPressed2 == false then
-        C_print("Removing waypoint")
-        RemoveLastPlacedWaypoint()
+    if C_isKeyPressed(Key.KEY_R) and isPressed2 == false then
+        if nrOfWP > 0 then
+            RemoveLastPlacedWaypoint()
+        end
         isPressed2 = true
-    elseif isPressed2 and C_isKeyPressed(Key.MOUSE_RIGHT) == false then
+    elseif isPressed2 and C_isKeyPressed(Key.KEY_R) == false then
         isPressed2 = false
     end
 
@@ -166,17 +167,15 @@ function AddWaypoint(x, y)
 end
 
 function RemoveLastPlacedWaypoint()
-    C_print("start removing waypoint")
+    if nrOfWP <= 0 then
+        error("trying to remove last placed waypoint when there is zero waypoints left", 2)
+    end
     local x = waypoints[nrOfWP].x / 13
     local y = waypoints[nrOfWP].z / 13
-    C_print("calculated x and y")
     table.remove(waypoints, nrOfWP)
     nrOfWP = nrOfWP - 1
 
-    C_print("Removed waypoint from waypoint table")
     grid:insert(0, x, y)
-    C_print("Removed waypoint from grid")
     gridObj:cell(x, y):removeFromDraw()
     gridObj:insert(nil, x, y)
-    C_print("Removed waypoint from gridObj")
 end
