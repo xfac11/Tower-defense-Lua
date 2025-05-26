@@ -8,8 +8,8 @@ function EditMode()
     z = z - 7
     
     
-    x = x / 13--size per node in world space
-    z = z / 13
+    x = x / NodeSize--size per node in world space
+    z = z / NodeSize
 
     x = x + 1--lua start at 1
     z = z + 1
@@ -20,7 +20,7 @@ function EditMode()
     local posX = x--stores the cellindex
     local posY = z
     if gridObj:isValid(posX, posY) then
-        selectObj:setPosition(posX * 13, -9, posY * 13)
+        selectObj:setPosition(posX * NodeSize, -9, posY * NodeSize)
     end
 
     if C_isKeyPressed(Key.MOUSE_LEFT) and isPressed == false then
@@ -57,8 +57,8 @@ function GameMode()
     z = z - 7
     
     
-    x = x / 13--size per node in world space
-    z = z / 13
+    x = x / NodeSize--size per node in world space
+    z = z / NodeSize
 
     x = x + 1--lua start at 1
     z = z + 1
@@ -73,7 +73,7 @@ function GameMode()
     local posX = x--stores the cellindex
     local posY = z
     if gridObj:isValid(posX, posY) then
-        selectObj:setPosition(posX * 13, -9, posY * 13)
+        selectObj:setPosition(posX * NodeSize, -9, posY * NodeSize)
     end
     C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
 
@@ -91,7 +91,7 @@ function GameMode()
                 testTower.model = "Assets/3DObjects/BetterCubeUV.obj"
                 testTower.drawType = 0
                 testTower.obj:addToDraw()
-                testTower.obj:setPosition(posX * 13, -6, posY * 13)
+                testTower.obj:setPosition(posX * NodeSize, -6, posY * NodeSize)
                 testTower.obj:setScale(2, 1.5, 2)
                 testTower.x = posX
                 testTower.y = posY
@@ -137,7 +137,7 @@ function AddCube(x, y)
         node.drawType = 0
         if gridObj:insert(node, x, y) then 
             gridObj:cell(x, y):addToDraw()
-            gridObj:cell(x, y):setPosition(x * 13, cubeBase, y * 13)
+            gridObj:cell(x, y):setPosition(x * NodeSize, cubeBase, y * NodeSize)
             gridObj:cell(x, y):setScale(cubeScale.x,cubeScale.y,cubeScale.z)
         end
     elseif grid:cell(x, y) ~= 0 then--there is a cube here so put none
@@ -152,14 +152,14 @@ function AddWaypoint(x, y)
     if grid:cell(x, y) == 0 then--There is not a cube here so put waypoint
         local value = nrOfWP + 10 --ex order: 0 + 10 = 10 first WP. To get index (value - 10) + 1
         nrOfWP = nrOfWP + 1
-        waypoints[nrOfWP] = Vector3:new(x * 13, 0, y * 13)
+        waypoints[nrOfWP] = Vector3:new(x * NodeSize, 0, y * NodeSize)
         grid:insert(value, x, y)
         local node = Gameobject:new()
         node.model = "Assets/3DObjects/BetterCubeUV.obj"
         node.drawType = 0
         if gridObj:insert(node, x, y) then 
             gridObj:cell(x, y):addToDraw()
-            gridObj:cell(x, y):setPosition(x * 13, 0, y * 13)
+            gridObj:cell(x, y):setPosition(x * NodeSize, 0, y * NodeSize)
             gridObj:cell(x, y):setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
             C_setTexture(gridObj:cell(x, y).typePtr, 0, "Assets/3DObjects/waypoint.tga")
         end
@@ -170,8 +170,8 @@ function RemoveLastPlacedWaypoint()
     if nrOfWP <= 0 then
         error("trying to remove last placed waypoint when there is zero waypoints left", 2)
     end
-    local x = waypoints[nrOfWP].x / 13
-    local y = waypoints[nrOfWP].z / 13
+    local x = waypoints[nrOfWP].x / NodeSize
+    local y = waypoints[nrOfWP].z / NodeSize
     table.remove(waypoints, nrOfWP)
     nrOfWP = nrOfWP - 1
 

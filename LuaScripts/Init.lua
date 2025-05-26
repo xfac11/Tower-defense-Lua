@@ -60,7 +60,7 @@ posY = -1
 gridObj = Grid:new()
 grid = loadGrid("Assets/Stages/stage1.lvl")
 gridObj:create(grid.width, grid.height)
-
+NodeSize = 13
 nrOfWP = 0 
 waypoints = {}
 
@@ -83,19 +83,19 @@ function loadInObjects()
                 node.drawType = 0
                 C_print("Added objects in world")
                 node:addToDraw()
-                node:setPosition(x * 13, cubeBase, y * 13)
+                node:setPosition(x * NodeSize, cubeBase, y * NodeSize)
                 node:setScale(cubeScale.x,cubeScale.y,cubeScale.z)
                 gridObj:insert(node, x, y)
                 
             elseif grid:cell(x, y) >= 10 then --place waypoint. Only for edit mode
                 local index = (grid:cell(x, y) - 10) + 1
-                waypoints[index] = Vector3:new(x * 13, -5, y * 13)
+                waypoints[index] = Vector3:new(x * NodeSize, -5, y * NodeSize)
                 nrOfWP = nrOfWP + 1
                 local node = Gameobject:new()
                 node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
                 node:addToDraw()
-                node:setPosition(x * 13, -5, y * 13)
+                node:setPosition(x * NodeSize, -5, y * NodeSize)
                 node:setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
                 C_setTexture(node.typePtr, 0, "Assets/3DObjects/waypoint.tga")
                 
@@ -117,8 +117,8 @@ function removeGridObjects()
 end
 loadInObjects()
 --Camera
-C_setCamTarget(6*13,0,6*13)
-C_setCamPos(150, 80, 6*13)
+C_setCamTarget(6*NodeSize,0,6*NodeSize)
+C_setCamPos(150, 80, 6*NodeSize)
 --UI
 
 panelPtr = nil
@@ -162,7 +162,7 @@ resetButton:setFunction(function ()
                 node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
                 node:addToDraw()
-                node:setPosition(x * 13, cubeBase, y * 13)
+                node:setPosition(x * NodeSize, cubeBase, y * NodeSize)
                 node:setScale(cubeScale.x,cubeScale.y,cubeScale.z)
                 gridObj:insert(node, x, y)
         end
@@ -241,7 +241,7 @@ ground = Gameobject:new()
 ground.model = "Assets/3DObjects/BetterCubeUV.obj"
 ground.drawType = 0
 ground:addToDraw()
-ground:setPosition(5.5*13,-50, 5.5*13)
+ground:setPosition(5.5*NodeSize,-50, 5.5*NodeSize)
 ground:setScale(200,0.1,200)
 C_setTexture(ground.typePtr, 0, "Assets/3DObjects/ground.tga")
 
