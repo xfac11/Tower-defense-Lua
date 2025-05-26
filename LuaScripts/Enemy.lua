@@ -4,6 +4,7 @@ local Vector3 = dofile("LuaScripts/Vector3.lua")
 local Gameobject = dofile("LuaScripts/Gameobject.lua")
 local Enemy = {obj = Gameobject:new(), from = Vector3:new(), to = Vector3:new(), check = 1, waypoints = 0, 
 startIndex = 1, endIndex = 0, hp = 100}
+local speed = 10
 
 function Enemy:new(c)
     c = c or {}
@@ -31,7 +32,7 @@ function Enemy:update(deltatime)
             self.to = self.waypoints[self.check + 1]--one for every enemy
         end
         
-        self.obj:move(10 * toNext.x * deltatime, 10 * toNext.y * deltatime, 10 * toNext.z * deltatime)
+        self.obj:move(speed * toNext.x * deltatime, speed * toNext.y * deltatime, speed * toNext.z * deltatime)
     end
     
 end
