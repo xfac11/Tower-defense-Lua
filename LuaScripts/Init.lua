@@ -55,6 +55,7 @@ end
 cubeBase = -10--y position
 cubeScale = Vector3:new(6.6,0.5,6.6)
 wayPointScale = Vector3:new(1,1,1)
+waypointBase = -5
 posX = -1
 posY = -1
 gridObj = Grid:new()
@@ -89,13 +90,13 @@ function loadInObjects()
                 
             elseif grid:cell(x, y) >= 10 then --place waypoint. Only for edit mode
                 local index = (grid:cell(x, y) - 10) + 1
-                waypoints[index] = Vector3:new(x * NodeSize, -5, y * NodeSize)
+                waypoints[index] = Vector3:new(x * NodeSize, waypointBase, y * NodeSize)
                 nrOfWP = nrOfWP + 1
                 local node = Gameobject:new()
                 node.model = "Assets/3DObjects/BetterCubeUV.obj"
                 node.drawType = 0
                 node:addToDraw()
-                node:setPosition(x * NodeSize, -5, y * NodeSize)
+                node:setPosition(x * NodeSize, waypointBase, y * NodeSize)
                 node:setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
                 C_setTexture(node.typePtr, 0, "Assets/3DObjects/waypoint.tga")
                 
@@ -236,6 +237,7 @@ enemyQueue = {}--waiting to go in the world( in table enemies)
 enemiesInQueue = 0
 queueTime = 1 
 waveNr = 1
+WaveScaler = 5
 totalTime = 0
 ground = Gameobject:new()
 ground.model = "Assets/3DObjects/BetterCubeUV.obj"
@@ -248,7 +250,8 @@ C_setTexture(ground.typePtr, 0, "Assets/3DObjects/ground.tga")
 function nextWave()
     --Start the next wave
     if nrOfEnemies == 0 then     
-        for i=1,waveNr*5 do
+        local enemiesToSpawn = waveNr * WaveScaler
+        for i=1,enemiesToSpawn do
             local e = Enemy:new()
             e.obj.model = "Assets/3DObjects/robot.obj"
             e.obj.drawType = 0
@@ -258,7 +261,7 @@ function nextWave()
             e.to:insert(waypoints[2].x, waypoints[2].y, waypoints[2].z)
             enemyQueue[i] = e
         end
-        enemiesInQueue = waveNr * 5
+        enemiesInQueue = enemiesToSpawn
         waveNr = waveNr + 1
     end
 end
