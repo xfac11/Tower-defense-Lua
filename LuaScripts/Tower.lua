@@ -24,7 +24,8 @@ function Tower:update(deltatime)
                 if lengthTo > self.range then
                     self.target = -1 
                 else
-                    bulletHandler:fireBullet(self.target, self.obj.position, self.dmg, 100)
+                    local bulletSpeed = 100
+                    bulletHandler:fireBullet(self.target, self.obj.position, self.dmg, bulletSpeed)
                 end
             end
         end
