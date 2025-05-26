@@ -17,58 +17,32 @@ function EditMode()
     x = math.floor( x )--removes the decimal  ex: 3.8 ==> 3
     z = math.floor( z )
 
-    posX = x--stores the cellindex
-    posY = z
+    local posX = x--stores the cellindex
+    local posY = z
     if gridObj:isValid(posX, posY) then
         selectObj:setPosition(posX * 13, -9, posY * 13)
     end
 
-    if MODE_C and C_isKeyPressed(Key.MOUSE_RIGHT) and isPressed2 == false then
-        if grid:cell(posX, posY) ~= 1 then--There is not a cube here so put cube
-            grid:insert(1, posX, posY)
-            local node = Gameobject:new()
-            node.model = "Assets/3DObjects/BetterCubeUV.obj"
-            node.drawType = 0
-            if gridObj:insert(node, posX, posY) then 
-                gridObj:cell(posX, posY):addToDraw()
-                gridObj:cell(posX, posY):setPosition(posX * 13, cubeBase, posY * 13)
-                gridObj:cell(posX, posY):setScale(cubeScale.x,cubeScale.y,cubeScale.z)
-            end
-        elseif grid:cell(posX, posY) ~= 0 then--there is a cube here so put none
-            grid:insert(0, posX, posY)
-            --remove cube from gridObj and draw
-            gridObj:cell(posX, posY):removeFromDraw()
-            gridObj:insert(nil, posX, posY)
+    if C_isKeyPressed(Key.MOUSE_LEFT) and isPressed == false then
+        C_print("Adding cube or waypoint")
+        if MODE_C then
+            AddCube(posX, posY)
+        elseif MODE_WP then
+            AddWaypoint(posX, posY)
         end
-        isPressed2 = true
-        --[[--]]
-    elseif isPressed2 and C_isKeyPressed(Key.MOUSE_RIGHT) == false then
-        isPressed2 = false
-    end
-
-    if MODE_WP and C_isKeyPressed(Key.MOUSE_LEFT) and isPressed == false then
-       
-        
-
-        
-        if grid:cell(posX, posY) == 0 then--There is not a cube here so put waypoint
-            local value = nrOfWP + 10 --ex order: 0 + 10 = 10 first WP. To get index (value - 10) + 1
-            nrOfWP = nrOfWP + 1
-            waypoints[nrOfWP] = Vector3:new(posX * 13, 0, posY * 13)
-            grid:insert(value, posX, posY)
-            local node = Gameobject:new()
-            node.model = "Assets/3DObjects/BetterCubeUV.obj"
-            node.drawType = 0
-            if gridObj:insert(node, posX, posY) then 
-                gridObj:cell(posX, posY):addToDraw()
-                gridObj:cell(posX, posY):setPosition(posX * 13, 0, posY * 13)
-                gridObj:cell(posX, posY):setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
-                C_setTexture(gridObj:cell(posX, posY).typePtr, 0, "Assets/3DObjects/waypoint.tga")
-            end
-        end       
         isPressed = true
     elseif isPressed and C_isKeyPressed(Key.MOUSE_LEFT) == false then
         isPressed = false
+    end
+
+
+    if C_isKeyPressed(Key.KEY_R) and isPressed2 == false then
+        if nrOfWP > 0 then
+            RemoveLastPlacedWaypoint()
+        end
+        isPressed2 = true
+    elseif isPressed2 and C_isKeyPressed(Key.KEY_R) == false then
+        isPressed2 = false
     end
 
 end
@@ -96,8 +70,8 @@ function GameMode()
     x = math.floor( x )--removes the decimal  ex: 3.8 ==> 3
     z = math.floor( z )
 
-    posX = x--stores the cellindex
-    posY = z
+    local posX = x--stores the cellindex
+    local posY = z
     if gridObj:isValid(posX, posY) then
         selectObj:setPosition(posX * 13, -9, posY * 13)
     end
@@ -155,4 +129,53 @@ function Update()
 end
 
 
+function AddCube(x, y)
+    if grid:cell(x, y) ~= 1 then--There is not a cube here so put cube
+        grid:insert(1, x, y)
+        local node = Gameobject:new()
+        node.model = "Assets/3DObjects/BetterCubeUV.obj"
+        node.drawType = 0
+        if gridObj:insert(node, x, y) then 
+            gridObj:cell(x, y):addToDraw()
+            gridObj:cell(x, y):setPosition(x * 13, cubeBase, y * 13)
+            gridObj:cell(x, y):setScale(cubeScale.x,cubeScale.y,cubeScale.z)
+        end
+    elseif grid:cell(x, y) ~= 0 then--there is a cube here so put none
+        grid:insert(0, x, y)
+        --remove cube from gridObj and draw
+        gridObj:cell(x, y):removeFromDraw()
+        gridObj:insert(nil, x, y)
+    end
+end
 
+function AddWaypoint(x, y)
+    if grid:cell(x, y) == 0 then--There is not a cube here so put waypoint
+        local value = nrOfWP + 10 --ex order: 0 + 10 = 10 first WP. To get index (value - 10) + 1
+        nrOfWP = nrOfWP + 1
+        waypoints[nrOfWP] = Vector3:new(x * 13, 0, y * 13)
+        grid:insert(value, x, y)
+        local node = Gameobject:new()
+        node.model = "Assets/3DObjects/BetterCubeUV.obj"
+        node.drawType = 0
+        if gridObj:insert(node, x, y) then 
+            gridObj:cell(x, y):addToDraw()
+            gridObj:cell(x, y):setPosition(x * 13, 0, y * 13)
+            gridObj:cell(x, y):setScale(wayPointScale.x, wayPointScale.y, wayPointScale.z)
+            C_setTexture(gridObj:cell(x, y).typePtr, 0, "Assets/3DObjects/waypoint.tga")
+        end
+    end       
+end
+
+function RemoveLastPlacedWaypoint()
+    if nrOfWP <= 0 then
+        error("trying to remove last placed waypoint when there is zero waypoints left", 2)
+    end
+    local x = waypoints[nrOfWP].x / 13
+    local y = waypoints[nrOfWP].z / 13
+    table.remove(waypoints, nrOfWP)
+    nrOfWP = nrOfWP - 1
+
+    grid:insert(0, x, y)
+    gridObj:cell(x, y):removeFromDraw()
+    gridObj:insert(nil, x, y)
+end
