@@ -1,4 +1,4 @@
-#include "WideText.h"
+#include<Tower-defense-Lua/WideText.h>
 #include <stdlib.h>
 #include <string.h>
 WideText::WideText(const char* text)
