@@ -15,15 +15,11 @@ int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	Game game;
-	/*
-	En bra tumregel f�r att separera logik fr�n C++ �r att t�nka p� att C++-delen ska kunna anv�ndas till olika typer av spel.
-	Det �r i Lua vi faktiskt skapar spelet. I verkligheten �r det sj�lvklart inte s� extremt, men i uppgiften g�r vi s� f�r tydlighetens skull
-	*/
-	//std::thread conThread(ConsoleThread, game.L);
+	std::thread conThread(ConsoleThread, game.L);
 
 	game.run();
 
 
-	//conThread.join();
+	conThread.join();
 	return 0;
 }

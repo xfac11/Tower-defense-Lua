@@ -1,3 +1,7 @@
+local Key = require "KeyboardKeys"
+local Tower = require "Tower"
+local Gameobject = require "Gameobject"
+local Vector3 = require "Vector3"
 --Key = dofile("Lua_Irrlicht_BTH_template/LuaScripts/KeyboardKeys.lua")
 function EditMode()
     -- body
