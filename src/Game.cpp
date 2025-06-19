@@ -1,4 +1,4 @@
-#include"Game.h"
+#include<Tower-defense-Lua/Game.h>
 irr::IrrlichtDevice* Game::device = nullptr;
 irr::video::IVideoDriver* Game::driver = nullptr;
 irr::scene::ISceneManager* Game::smgr = nullptr;
@@ -46,10 +46,10 @@ void Game::initIrrlicht()
 
 
 	//Set default settings and a camera for irrlicht
-	if (device->getFileSystem()->changeWorkingDirectoryTo(CWD))
+	/*if (device->getFileSystem()->changeWorkingDirectoryTo(CWD))
 	{
 		std::cout << "Successfully changed the working directory to:" << device->getFileSystem()->getWorkingDirectory().c_str() << "\n";
-	}
+	}*/
 	
 	font = device->getGUIEnvironment()->getFont(DEFAULTFONT);
 
@@ -99,10 +99,30 @@ void Game::initLua()
 	lua_pushcfunction(L, this->C_print);
 	lua_setglobal(L, "C_print");
 
-	luaL_dofile(L, "LuaScripts/Init.lua");
+	lua_getglobal(L, "package");
+	lua_getfield(L, -1, "path"); // get field "path" from table at top of stack (-1)
+	std::string cur_path = lua_tostring(L, -1); // grab path string from top of stack
+	cur_path.append(";" RESOURCES_PATH "LuaScripts/?.lua"); // do your path magic here
+	lua_pop(L, 1); // get rid of the string on the stack we just pushed on line 5
+	lua_pushstring(L, cur_path.c_str()); // push the new one
+	lua_setfield(L, -2, "path"); // set the field "path" in table at -2 with value at top of stack
+	lua_pop(L, 1); // get rid of package table from top of stack
+	
+
+	int result = luaL_dofile(L, RESOURCES_PATH "LuaScripts/Init.lua");
+	if (result != LUA_OK)
+	{
+		std::string errormsg = lua_tostring(L, -1);
+		std::cout << errormsg << "\n";
+	}
 	//Load and call update.lua script to push the global Update function in the lua script.
 	//This Lua global Update function is then called in Game::update()
-	luaL_dofile(L, "LuaScripts/update.lua");
+	result = luaL_dofile(L, RESOURCES_PATH "LuaScripts/update.lua");
+	if (result != LUA_OK)
+	{
+		std::string errormsg = lua_tostring(L, -1);
+		std::cout << errormsg << "\n";
+	}
 }
 
 void Game::run()
@@ -132,11 +152,16 @@ int Game::C_addToDraw(lua_State* L)
 			std::cerr << "Error, not enought parameters were passed\n";
 		}
 		const char* model = lua_tostring(L, -1);
+		std::string path = RESOURCES_PATH;
+		path.append(model);
 		lua_pop(L, 1);
-		irr::scene::IMesh* mesh = smgr->getMesh(model);//change to model
-
+		irr::scene::IMesh* mesh = smgr->getMesh(path.c_str());//change to model
+		if (mesh == nullptr)
+		{
+			std::cout << "Could not load mesh " << mesh;
+		}
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
-		irr::video::ITexture *texture = driver->getTexture("Assets/3DObjects/cube2.tga");
+		irr::video::ITexture *texture = driver->getTexture(RESOURCES_PATH "Assets/3DObjects/cube2.tga");
 		if(texture == nullptr)
 		{
 			std::cout << "Could not load texture " << "Assets/3DObjects/cube2.tga\n";
@@ -159,11 +184,12 @@ int Game::C_addToDraw(lua_State* L)
 			std::cerr << "Error, not enought parameters were passed\n";
 		}
 
-		const char* texture = lua_tostring(L, -1);
+		std::string texture = RESOURCES_PATH;
+		texture.append(lua_tostring(L, -1));
 
 
 		gui::IGUIButton* button = guienv->addButton(core::recti(0, 0, 50, 50));
-		button->setImage(driver->getTexture(texture));
+		button->setImage(driver->getTexture(texture.c_str()));
 		//button->setScaleImage(true);
 		button->setOverrideFont(font);
 		
@@ -229,13 +255,14 @@ int Game::C_addToDraw(lua_State* L)
 		int x = (int)lua_tonumber(L, -3);
 		int y = (int)lua_tonumber(L, -2);
 
-		const char* texture = lua_tostring(L, -1);
+		std::string texture = RESOURCES_PATH;
+		texture.append(lua_tostring(L, -1));
 
 		core::vector2di position(x, y);
 
 		gui::IGUIImage* image = nullptr;
 		irr::video::ITexture* irrTexture = nullptr;
-		irrTexture = driver->getTexture(texture);
+		irrTexture = driver->getTexture(texture.c_str());
 		if (irrTexture == nullptr)
 		{
 			std::cerr << " Error loading texture \n";
@@ -296,7 +323,8 @@ int Game::C_setVisible(lua_State* L)
 
 int Game::C_loadStage(lua_State* L)
 {
-	std::string fileName = lua_tostring(L, -1);
+	std::string fileName = RESOURCES_PATH;
+	fileName.append(lua_tostring(L, -1));
 	lua_pop(L, 1);
 	std::ifstream rf(fileName, std::ios::out | std::ios::binary);
 	Stage stage;
@@ -324,7 +352,8 @@ int Game::C_loadStage(lua_State* L)
 }
 int Game::C_saveStage(lua_State* L)
 {
-	std::string fileName = lua_tostring(L, -1);
+	std::string fileName = RESOURCES_PATH;
+	fileName.append(lua_tostring(L, -1));
 	lua_pop(L, 1);
 	std::ofstream wf(fileName, std::ios::out | std::ios::binary);
 	Stage stage{};
@@ -470,19 +499,20 @@ int Game::C_setCamTarget(lua_State* L)
 }
 int Game::C_setTexture(lua_State* L)
 {
-	const char* texture = lua_tostring(L, -1);
+	std::string texture = RESOURCES_PATH;
+	texture.append(lua_tostring(L, -1));
 	int type = (int)lua_tonumber(L, -2);
 	scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)lua_touserdata(L, -3);
 
 	if (type == DrawType::MESH)
 	{
-		node->setMaterialTexture(0, driver->getTexture(texture));
+		node->setMaterialTexture(0, driver->getTexture(texture.c_str()));
 	}
 	else if (type == DrawType::BUTTON)
 	{
 		gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -3);
 		if (button != nullptr)
-			button->setImage(driver->getTexture(texture));
+			button->setImage(driver->getTexture(texture.c_str()));
 	}
 	else if(type == 3)
 	lua_pop(L, 3);
@@ -549,10 +579,11 @@ int Game::C_setFont(lua_State* L)
 	if (type == DrawType::BUTTON)
 	{
 		gui::IGUIButton* button = (gui::IGUIButton*)lua_touserdata(L, -2);
-		const char* fontPath = lua_tostring(L, -1);
+		std::string fontPath = RESOURCES_PATH;
+		fontPath.append(lua_tostring(L, -1));
 		if (button != nullptr)
 		{
-			const irr::io::path irrPath(fontPath);
+			const irr::io::path irrPath(fontPath.c_str());
 			irr::gui::IGUIFont* irrFont = guienv->getFont(irrPath);
 			if (irrFont == nullptr)
 			{
@@ -565,10 +596,11 @@ int Game::C_setFont(lua_State* L)
 	else if (type == DrawType::TEXT)
 	{
 		gui::IGUIStaticText* text = (gui::IGUIStaticText*)lua_touserdata(L, -2);
-		const char* fontPath = lua_tostring(L, -1);
+		std::string fontPath = RESOURCES_PATH;
+		fontPath.append(lua_tostring(L, -1));
 		if (text != nullptr)
 		{
-			const irr::io::path irrPath(fontPath);
+			const irr::io::path irrPath(fontPath.c_str());
 			irr::gui::IGUIFont* irrFont = guienv->getFont(irrPath);
 			if (irrFont == nullptr)
 			{
