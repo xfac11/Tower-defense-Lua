@@ -6,8 +6,13 @@ void static ConsoleThread(lua_State* L)
 	while (GetConsoleWindow()) {
 		memset(command, 0, 1000);
 		std::cin.getline(command, 1000);
+		if (strcmp(command, "exit") == 0)
+		{
+			break;
+		}
 		if (luaL_loadstring(L, command) || lua_pcall(L, 0, 0, 0))
 			std::cout << lua_tostring(L, -1) << '\n';
+		
 	}
 }
 

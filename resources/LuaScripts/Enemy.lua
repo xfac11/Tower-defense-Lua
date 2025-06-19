@@ -1,8 +1,7 @@
 
 
-local Vector3 = require "Vector3"
-local Gameobject = require "Gameobject"
-local Enemy = {obj = Gameobject:new(), from = Vector3:new(), to = Vector3:new(), check = 1, waypoints = 0, 
+local Commons = require "Commons"
+local Enemy = {obj = Commons.Gameobject:new(), from = Commons.Vector3:new(), to = Commons.Vector3:new(), check = 1, waypoints = 0, 
 startIndex = 1, endIndex = 0, hp = 100}
 local speed = 10
 
@@ -11,7 +10,7 @@ function Enemy:new(c)
     setmetatable(c, self)
     self.__index = self
     
-    c.obj = Gameobject:new()
+    c.obj = Commons.Gameobject:new()
     return c
 end
 
