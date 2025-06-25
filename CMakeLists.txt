@@ -12,14 +12,14 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-    #include(CTest)
+    include(CTest)
 
     # Add doc generation here?
 endif()
 
 find_package(irrlicht CONFIG REQUIRED)
 find_package(Lua REQUIRED)
-
+find_package(Catch REQUIRED)
 add_subdirectory(src)
 
 add_subdirectory(apps)
