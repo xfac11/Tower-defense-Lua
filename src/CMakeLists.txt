@@ -12,7 +12,7 @@ set(HEADER_LIST
 
 add_library(game_engine "${SOURCE_LIST}" "${HEADER_LIST}")
 
-target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="D:/GitProjekt/Tower-defense-Lua/resources/")
+target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="${PROJECT_SOURCE_DIR}/resources/")
 
 target_include_directories(game_engine PUBLIC ../include)
 target_include_directories(game_engine PUBLIC ${LUA_INCLUDE_DIR})
