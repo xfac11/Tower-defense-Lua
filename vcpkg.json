@@ -1,6 +1,7 @@
 {
   "dependencies": [
+    "irrlicht",
     "lua",
-    "irrlicht"
+    "catch2"
   ]
 }

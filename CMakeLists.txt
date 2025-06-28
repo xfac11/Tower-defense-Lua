@@ -19,11 +19,10 @@ endif()
 
 find_package(irrlicht CONFIG REQUIRED)
 find_package(Lua REQUIRED)
-find_package(Catch REQUIRED)
 add_subdirectory(src)
 
 add_subdirectory(apps)
 
-#if(BUILD_TESTING)
-#    add_subdirectory(tests)
-#endif()
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
