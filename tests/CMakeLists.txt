@@ -1,3 +1,6 @@
-add_executable(test test.cpp)
+find_package(Catch2 3 REQUIRED)
 
-target_link_libraries(test PRIVATE game_engine)
+add_executable(tests test.cpp)
+target_link_libraries(tests PRIVATE game_engine Catch2::Catch2WithMain)
+include(Catch)
+catch_discover_tests(tests)
