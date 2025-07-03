@@ -25,7 +25,10 @@ Game::Game()
 Game::~Game()
 {
 	CoUninitialize();
-	device->drop();
+	if(device != nullptr)
+	{
+		device->drop();
+	}
 	lua_close(L);
 }
 
