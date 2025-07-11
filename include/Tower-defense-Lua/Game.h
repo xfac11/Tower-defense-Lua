@@ -81,7 +81,7 @@ private:
 	const core::vector3df DEFAULTCAMERAPOSITION = core::vector3df(0, 50, -1);
 
 	void render();//C++
-	void initIrrlicht();
+	int initIrrlicht();
 	void update() const;//LUA
 	void initLua();
 

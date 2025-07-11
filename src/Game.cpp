@@ -13,11 +13,23 @@ irr::gui::IGUIFont* Game::font = nullptr;
 
 Game::Game()
 {
-	HRESULT result = CoInitialize(nullptr);
+	HRESULT hresult = CoInitialize(nullptr);
+	if(hresult != S_OK)
+	{
+		throw std::logic_error("Could not CoInititialzie"); 
+	}
 	L = luaL_newstate();
+	if(L == nullptr)
+	{
+		throw std::logic_error("Could not create a new lua state");
+	}
 	luaL_openlibs(L);
 	this->eventRec = MyEventReceiver();
-	initIrrlicht();
+	int result = initIrrlicht();
+	if (result != 0)
+	{
+		throw std::logic_error("Could not create and init irrlicht");
+	}
 	initLua();
 	device->getCursorControl()->setVisible(true);
 }
@@ -32,7 +44,7 @@ Game::~Game()
 	lua_close(L);
 }
 
-void Game::initIrrlicht()
+int Game::initIrrlicht()
 {
 	SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
 	params.AntiAlias = ANTIALIAS;
@@ -41,7 +53,10 @@ void Game::initIrrlicht()
 	params.EventReceiver = &eventRec;
 
 	this->device = irr::createDeviceEx(params);
-
+	if(this->device == NULL)
+	{
+		return -1;
+	}
 	this->driver = device->getVideoDriver();
 	this->smgr = device->getSceneManager();
 	this->guienv = device->getGUIEnvironment();
@@ -57,6 +72,7 @@ void Game::initIrrlicht()
 	font = device->getGUIEnvironment()->getFont(DEFAULTFONT);
 
 	this->camera = smgr->addCameraSceneNode((irr::scene::ISceneNode*)0, DEFAULTCAMERAPOSITION, DEFAULTCAMERALOOKAT);
+	return 0;
 }
 
 void Game::initLua()
