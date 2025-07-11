@@ -47,3 +47,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}} --verbose
 
+    - name: Test failed
+      working-directory: ${{github.workspace}}/build
+      run: ctest --rerun-failed --output-on-failure
+
