@@ -14,6 +14,7 @@ irr::gui::IGUIFont* Game::font = nullptr;
 Game::Game()
 {
 	HRESULT hresult = CoInitialize(nullptr);
+	std::cout << "Creating game object\n";
 	if(hresult != S_OK)
 	{
 		throw std::logic_error("Could not CoInititialzie"); 

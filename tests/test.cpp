@@ -16,7 +16,9 @@ TEST_CASE( "Factorials are computed", "[factorial]" )
 
 TEST_CASE( "Game Object Try constructor and destructor", "[game engine]")
 {
+	std::cout << "Starting test\n";
 	Game* game = new Game();
+	INFO("CREATD GAME OBJECT");
 	REQUIRE(game != nullptr);
 	delete game;
 	game = nullptr;
