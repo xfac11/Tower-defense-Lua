@@ -152,7 +152,7 @@ int Game::C_addToDraw(lua_State* L)
 		int top = lua_gettop(L);
 		if (top != 1)
 		{
-			std::cerr << "Error, not enought parameters were passed\n";
+			return luaL_error(L, "Error, not enought parameters were passed\n");
 		}
 		const char* model = lua_tostring(L, -1);
 		std::string path = RESOURCES_PATH;
@@ -161,13 +161,13 @@ int Game::C_addToDraw(lua_State* L)
 		irr::scene::IMesh* mesh = smgr->getMesh(path.c_str());//change to model
 		if (mesh == nullptr)
 		{
-			std::cout << "Could not load mesh " << mesh;
+			return luaL_error(L, "Could not load mesh with path: %s", path);
 		}
 		scene::IMeshSceneNode* node = smgr->addMeshSceneNode(mesh);
 		irr::video::ITexture *texture = driver->getTexture(RESOURCES_PATH "Assets/3DObjects/cube2.tga");
 		if(texture == nullptr)
 		{
-			std::cout << "Could not load texture " << "Assets/3DObjects/cube2.tga\n";
+			return luaL_error(L, "Could not load texture %s", "Assets/3DObjects/cube2.tga");
 		}
 		else
 		{

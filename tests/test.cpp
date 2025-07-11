@@ -22,3 +22,29 @@ TEST_CASE( "Game Object Try constructor and destructor", "[game engine]")
 	game = nullptr;
 	REQUIRE(game == nullptr);
 }
+
+TEST_CASE( "Create game and load", "[game engine]")
+{
+	Game* game = new Game();
+	REQUIRE(game != nullptr);
+	//Test a load with a script with good paths
+	int result = luaL_dofile(game->L, RESOURCES_PATH "LuaScripts/tests/testLoad.lua");
+	if(result != LUA_OK)
+	{
+		std::string errormsg = lua_tostring(game->L, -1);
+		FAIL(errormsg);
+	}
+	REQUIRE(result == LUA_OK);
+	//Test a load with a script with bad paths
+	result = luaL_dofile(game->L, RESOURCES_PATH "LuaScripts/tests/testLoadFail.lua");
+	if(result != LUA_OK)
+	{
+		std::string errormsg = lua_tostring(game->L, -1);
+		INFO(errormsg);
+	}
+	REQUIRE(result != LUA_OK);
+
+	delete game;
+	game = nullptr;
+	REQUIRE(game == nullptr);
+}
