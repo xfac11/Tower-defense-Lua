@@ -12,8 +12,8 @@ set(HEADER_LIST
 
 add_library(game_engine "${SOURCE_LIST}" "${HEADER_LIST}")
 
-target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="${PROJECT_SOURCE_DIR}/resources/")
-##target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="resources/")
+##target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="${PROJECT_SOURCE_DIR}/resources/")
+target_compile_definitions(game_engine PUBLIC RESOURCES_PATH="./resources/")
 
 
 target_include_directories(game_engine PUBLIC ../include)
