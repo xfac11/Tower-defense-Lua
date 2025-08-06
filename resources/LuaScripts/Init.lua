@@ -11,6 +11,8 @@ local Bullet = require "Bullet"
 local BulletHandler = require "BulletHandler"
 local Button = require "Button"
 local Tower = require "Tower"
+local Subject = require "Subject"
+local Observer = require "Observer"
 C_print("Requiring Tower")
 DrawType = {
     MESH = 0,
@@ -227,6 +229,18 @@ COINS = 20
 coinsText = C_addToDraw(120, 120, 150, 150, 2, "Coins:123")
 UI.text["coinsText"] = coinsText
 C_setText(coinsText,"$"..tostring(COINS))
+function AddCoins(data)
+    COINS = COINS + data.value
+end
+function UpdateCoinUI(data)
+    C_setText(coinsText, "$" .. tostring(COINS))
+end
+AddCoinObs = Observer:new("Add coins obs", AddCoins)
+UpdateCoinUIObs = Observer:new("Update coin UI obs", UpdateCoinUI)
+
+OnEnemyDeath = Subject:new()
+OnEnemyDeath.addObserver(AddCoinObs)
+OnEnemyDeath.addObserver(UpdateCoinUIObs)
 isPressed = false
 isPressed2 = false
 
@@ -285,6 +299,7 @@ function updateQueue(deltaTime)
         end
     end
 end
+local enemydata = {value  = 5}
 function updateEnemies(deltaTime)
     local nrOfNil = 0
     
@@ -297,7 +312,7 @@ function updateEnemies(deltaTime)
             elseif enemies[i].hp <= 0 then 
                 enemies[i].obj:removeFromDraw()
                 enemies[i] = nil
-                COINS = COINS + 10
+                OnEnemyDeath.notifyObservers(enemydata)
             end
         else
             nrOfNil = nrOfNil + 1

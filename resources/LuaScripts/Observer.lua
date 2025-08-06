@@ -1,10 +1,10 @@
 local Observer = {}
 Observer.__index = Observer
 
-function Observer.new(name)
+function Observer.new(name, aFunction)
     local self = setmetatable({}, Observer)
     self.name = name or "Unnamed Observer"
-    self.theFunction = function(data)
+    self.theFunction = aFunction or function(data)
         print(self.name .. " received some data: " .. tostring(data))
     end
     return self
