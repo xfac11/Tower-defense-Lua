@@ -1,10 +1,13 @@
-local Subject = {}
-Subject.__index = Subject
+local Subject = {observers = {}}
 
-function Subject.new()
-    local self = setmetatable({}, Subject)
-    self.observers = {}
-    return self
+function Subject:new()
+    local c = {}
+    setmetatable(c, self)
+    self.__index = self
+
+    c.observers = {}
+    
+    return c
 end
 
 function Subject:addObserver(observer)
@@ -22,6 +25,7 @@ end
 
 function Subject:notifyObservers(data)
     for _, observer in ipairs(self.observers) do
+        C_print("Subjet updating observer")
         observer:update(data)
     end
 end

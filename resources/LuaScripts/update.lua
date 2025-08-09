@@ -56,7 +56,7 @@ function GameMode()
     local deltatime = C_getDeltaTime()
 
     local x, y, z = C_getMousePos3D(0, -9, 0)--parameter is a position where the plane is. can be one nodes pos
-    C_print(x)
+    
     x = x - 7--offset from 0,0,0
     z = z - 7
     
@@ -66,7 +66,7 @@ function GameMode()
 
     x = x + 1--lua start at 1
     z = z + 1
-    C_setText(coinsText,"$"..tostring(COINS))
+    --C_setText(coinsText,"$"..tostring(COINS))
 
     
 
@@ -79,7 +79,6 @@ function GameMode()
     if gridObj:isValid(posX, posY) then
         selectObj:setPosition(posX * NodeSize, -9, posY * NodeSize)
     end
-    C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
 
     local towerHere = false
     if C_isKeyPressed(Key.MOUSE_LEFT) and isPressed == false then
@@ -101,7 +100,7 @@ function GameMode()
                 testTower.y = posY
                 C_setTexture(testTower.obj.typePtr, 0, "Assets/3DObjects/buttonStart.tga")
                 table.insert(towers, testTower)
-                COINS = COINS - 10
+                AddCoins({value = -TOWER_PRICE})
             end
         end
         isPressed = true

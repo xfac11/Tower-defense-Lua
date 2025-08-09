@@ -33,6 +33,10 @@ MODETEXT = C_addToDraw(1200, 600, 1300, 700, DrawType.TEXT, "")
 C_setFont(MODETEXT, DrawType.TEXT, "Assets/Fonts/myfont.xml")
 textBox = C_addToDraw(1000, 600, 1300, 700, DrawType.EDITBOX, "")
 PLAYER_HP = 100
+function DecreasePlayerHP(damage)
+    PLAYER_HP = PLAYER_HP - damage
+    OnPlayerHPChanged:notifyObservers({})
+end
 function loadGrid(fileName)
 	stage, width, height = C_loadStage(fileName)
     local grid = Grid:new()
@@ -225,28 +229,35 @@ EDIT_UI.buttons["objButton"] = objButton
 
 GAME_UI.buttons["objButton"] = objButton
 COINS = 20
-
+TOWER_PRICE = 10
 coinsText = C_addToDraw(120, 120, 150, 150, 2, "Coins:123")
 UI.text["coinsText"] = coinsText
 C_setText(coinsText,"$"..tostring(COINS))
-function AddCoins(data)
-    COINS = COINS + data.value
-end
 function UpdateCoinUI(data)
     C_setText(coinsText, "$" .. tostring(COINS))
 end
-AddCoinObs = Observer:new("Add coins obs", AddCoins)
-UpdateCoinUIObs = Observer:new("Update coin UI obs", UpdateCoinUI)
+OnCoinsChanged = Subject:new()
 
+function AddCoins(data)
+    COINS = COINS + data.value
+    OnCoinsChanged:notifyObservers({})
+end
+
+UpdateCoinUIObs = Observer:new("Update coin UI obs", UpdateCoinUI)
+OnCoinsChanged:addObserver(UpdateCoinUIObs)
+AddCoinObs = Observer:new("Add coins obs", AddCoins)
 OnEnemyDeath = Subject:new()
-OnEnemyDeath.addObserver(AddCoinObs)
-OnEnemyDeath.addObserver(UpdateCoinUIObs)
+OnEnemyDeath:addObserver(AddCoinObs)
+
+
 isPressed = false
 isPressed2 = false
 
 hpText = C_addToDraw(120,160,160,200,DrawType.TEXT,"HP:")
 C_setText(hpText,"HP:" .. tostring(PLAYER_HP))
-
+OnPlayerHPChanged = Subject:new()
+UpdatePlayerHealthUIObs = Observer:new("PlayerHealthUI", function (data) C_setText(hpText,"HP:" .. tostring(PLAYER_HP)) end)
+OnPlayerHPChanged:addObserver(UpdatePlayerHealthUIObs)
 --Game
 towers = {}
 enemies = {}--in the world updating and walking towards waypoints
@@ -299,7 +310,7 @@ function updateQueue(deltaTime)
         end
     end
 end
-local enemydata = {value  = 5}
+enemydata = {value  = 5}
 function updateEnemies(deltaTime)
     local nrOfNil = 0
     
@@ -308,11 +319,11 @@ function updateEnemies(deltaTime)
             if enemies[i].check == enemies[i].endIndex  then
                 enemies[i].obj:removeFromDraw()
                 enemies[i] = nil
-                PLAYER_HP = PLAYER_HP - 5
+                DecreasePlayerHP(5)
             elseif enemies[i].hp <= 0 then 
                 enemies[i].obj:removeFromDraw()
                 enemies[i] = nil
-                OnEnemyDeath.notifyObservers(enemydata)
+                OnEnemyDeath:notifyObservers(enemydata)
             end
         else
             nrOfNil = nrOfNil + 1
