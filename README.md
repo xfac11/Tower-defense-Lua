@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/xfac11/Tower-defense-Lua">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="resources/Assets/Textures/SelectBlock.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">LuaTowers</h3>
@@ -93,14 +93,10 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* [<img src=https://irrlicht.sourceforge.io/images/irrlicht_logo.png width="25%" height="25%" />][Irrlicht-url]
+* [![CMake][CMake.com]][CMake-url]
+* [![Lua][Lua.com]][Lua-url]
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -255,4 +251,10 @@ Project Link: [https://github.com/xfac11/Tower-defense-Lua](https://github.com/x
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[JQuery-url]: https://jquery.com
+[Irrlicht.com]: https://irrlicht.sourceforge.io/images/irrlicht_logo.png
+[Irrlicht-url]: https://irrlicht.sourceforge.io/
+[CMake.com]: https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white
+[CMake-url]: https://cmake.org/
+[Lua-url]: https://www.lua.org/home.html
+[Lua.com]: https://img.shields.io/badge/Lua-2C2D72?style=for-the-badge&logo=lua&logoColor=white
